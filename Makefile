@@ -1,15 +1,19 @@
-CC = gcc
-CFLAGS = -Wall -Wextra -Werror -std=c99 -pedantic -O3 -mavx2
+CXX = g++
+CXXFLAGS = -Wall -Wextra -Werror -std=c++11 -pedantic -O3 -mavx512vl #-fsanitize=alignment
+LDLIBS = -lbenchmark
 
-TARGETS := base2d base4d trans4d
+EXECS := main
 
-all: $(TARGETS)
+all: $(EXECS) $(EXECS:=.s)
 
-$(TARGETS): %: %.o
-	$(CC) $(CFLAGS) -o $@ $<
+$(EXECS): %: %.o s_trans4.h v_trans4.h
+	$(CXX) $(CXXFLAGS) $< -o $@ $(LDLIBS)
 
-%.o: %.c
-	$(CC) $(CFLAGS) -c $< -o $@
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+%.s: %.cpp
+	$(CXX) $(CXXFLAGS) -S $< -o $@
 
 clean:
-	rm -f $(TARGETS) *.o
+	rm -f $(EXECS) *.o *.s
