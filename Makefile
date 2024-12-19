@@ -1,16 +1,17 @@
 CXX = g++
 CXXFLAGS = -Wall -Wextra -Werror -std=c++14 -pedantic -O3 -mavx512vl #-fsanitize=alignment
 LDLIBS = -lbenchmark
+GTEST = -lgtest #-lgtest_main -pthread
 
-EXECS := bench2 bench4
+EXECS := bench2 bench4 test2 test4
 INCLUDES := s_trans.h v_trans.h
 
 all: $(EXECS) $(EXECS:=.s)
 
-$(EXECS): %: %.o $(INCLUDES)
-	$(CXX) $(CXXFLAGS) $< -o $@ $(LDLIBS)
+$(EXECS): %: %.o
+	$(CXX) $(CXXFLAGS) $< -o $@ $(LDLIBS) $(GTEST)
 
-%.o: %.cpp
+%.o: %.cpp $(INCLUDES)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 %.s: %.cpp

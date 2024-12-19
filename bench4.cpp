@@ -57,7 +57,7 @@ static void BM_STransform(benchmark::State& state) {
     s_point<4> q;
     benchmark::DoNotOptimize(t);
     for (auto _: state) {
-        q = t(p);
+        q = t * p;
         benchmark::DoNotOptimize(q);
     }
 }
@@ -69,7 +69,7 @@ static void BM_VTransformMul(benchmark::State& state) {
     v_point<4> q;
     benchmark::DoNotOptimize(t);
     for (auto _: state) {
-        q = t(p);
+        q = t * p;
         benchmark::DoNotOptimize(q);
     }
 }
