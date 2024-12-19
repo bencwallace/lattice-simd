@@ -1,5 +1,15 @@
 # SIMD Lattice Transformations
 
+Todo:
+
+* Transform point
+* Transform box
+* Compose transforms
+* Box intersection
+* Box union
+* Point arithmetic
+* Translate box
+
 Ideas:
 
 * Flip sign with sub or xor instead of mult

@@ -2,30 +2,32 @@
 #include <cstddef>
 #include <cstdint>
 
-using s_point4 = std::array<int32_t, 4>;
+template <int N>
+using s_point = std::array<int32_t, N>;
 
-struct s_trans4 {
-    int32_t signs[4];
-    uint32_t perm[4];
+template <int N>
+struct s_trans {
+    int32_t signs[N];
+    uint32_t perm[N];
 
-    s_point4 permute(const s_point4 &p) const {
-        s_point4 q;
+    s_point<N> permute(const s_point<N> &p) const {
+        s_point<N> q;
         for (size_t i = 0; i < 4; i++) {
             q[i] = p[perm[i]];
         }
         return q;
     }
 
-    s_point4 flip(const s_point4 &p) const {
-        s_point4 q;
+    s_point<N> flip(const s_point<N> &p) const {
+        s_point<N> q;
         for (size_t i = 0; i < 4; i++) {
             q[i] = p[i] * signs[i];
         }
         return q;
     }
 
-    s_point4 operator()(const s_point4 &p) const {
-        s_point4 q;
+    s_point<N> operator()(const s_point<N> &p) const {
+        s_point<N> q;
         for (size_t i = 0; i < 4; i++) {
             q[i] = p[perm[i]] * signs[i];
         }

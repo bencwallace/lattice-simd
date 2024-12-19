@@ -2,11 +2,12 @@ CXX = g++
 CXXFLAGS = -Wall -Wextra -Werror -std=c++11 -pedantic -O3 -mavx512vl #-fsanitize=alignment
 LDLIBS = -lbenchmark
 
-EXECS := main
+EXECS := bench4
+INCLUDES := s_trans.h v_trans.h
 
 all: $(EXECS) $(EXECS:=.s)
 
-$(EXECS): %: %.o s_trans4.h v_trans4.h
+$(EXECS): %: %.o $(INCLUDES)
 	$(CXX) $(CXXFLAGS) $< -o $@ $(LDLIBS)
 
 %.o: %.cpp

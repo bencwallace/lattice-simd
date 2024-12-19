@@ -1,12 +1,12 @@
-#include "s_trans4.h"
-#include "v_trans4.h"
+#include "s_trans.h"
+#include "v_trans.h"
 
 #include <benchmark/benchmark.h>
 
 static void BM_SPermute(benchmark::State& state) {
-    s_point4 p = {1, 2, 3, 4};
-    s_trans4 t = {{-1, -1, -1, -1}, {1, 2, 3, 0}};
-    s_point4 q;
+    s_point<4> p = {1, 2, 3, 4};
+    s_trans<4> t = {{-1, -1, -1, -1}, {1, 2, 3, 0}};
+    s_point<4> q;
     benchmark::DoNotOptimize(t);        // force read from memory -- prevent pre-computation
     for (auto _: state) {
         q = t.permute(p);
@@ -16,9 +16,9 @@ static void BM_SPermute(benchmark::State& state) {
 BENCHMARK(BM_SPermute);
 
 static void BM_VPermuteMul(benchmark::State& state) {
-    v_point4 p = {1, 2, 3, 4};
-    v_trans4_mul t = {{-1, -1, -1, -1}, {1, 2, 3, 0}};
-    v_point4 q;
+    v_point<4> p = {1, 2, 3, 4};
+    v_trans_mul<4> t = {{-1, -1, -1, -1}, {1, 2, 3, 0}};
+    v_point<4> q;
     benchmark::DoNotOptimize(t);
     for (auto _: state) {
         q = t.permute(p);
@@ -28,9 +28,9 @@ static void BM_VPermuteMul(benchmark::State& state) {
 BENCHMARK(BM_VPermuteMul);
 
 static void BM_SFlip(benchmark::State& state) {
-    s_point4 p = {1, 2, 3, 4};
-    s_trans4 t = {{-1, -1, -1, -1}, {1, 2, 3, 0}};
-    s_point4 q;
+    s_point<4> p = {1, 2, 3, 4};
+    s_trans<4> t = {{-1, -1, -1, -1}, {1, 2, 3, 0}};
+    s_point<4> q;
     benchmark::DoNotOptimize(t);
     for (auto _: state) {
         q = t.flip(p);
@@ -40,9 +40,9 @@ static void BM_SFlip(benchmark::State& state) {
 BENCHMARK(BM_SFlip);
 
 static void BM_VFlipMul(benchmark::State& state) {
-    v_point4 p = {1, 2, 3, 4};
-    v_trans4_mul t = {{-1, -1, -1, -1}, {1, 2, 3, 0}};
-    v_point4 q;
+    v_point<4> p = {1, 2, 3, 4};
+    v_trans_mul<4> t = {{-1, -1, -1, -1}, {1, 2, 3, 0}};
+    v_point<4> q;
     benchmark::DoNotOptimize(t);
     for (auto _: state) {
         q = t.flip(p);
@@ -52,9 +52,9 @@ static void BM_VFlipMul(benchmark::State& state) {
 BENCHMARK(BM_VFlipMul);
 
 static void BM_STransform(benchmark::State& state) {
-    s_point4 p = {1, 2, 3, 4};
-    s_trans4 t = {{-1, -1, -1, -1}, {1, 2, 3, 0}};
-    s_point4 q;
+    s_point<4> p = {1, 2, 3, 4};
+    s_trans<4> t = {{-1, -1, -1, -1}, {1, 2, 3, 0}};
+    s_point<4> q;
     benchmark::DoNotOptimize(t);
     for (auto _: state) {
         q = t(p);
@@ -64,9 +64,9 @@ static void BM_STransform(benchmark::State& state) {
 BENCHMARK(BM_STransform);
 
 static void BM_VTransformMul(benchmark::State& state) {
-    v_point4 p = {1, 2, 3, 4};
-    v_trans4_mul t = {{-1, -1, -1, -1}, {1, 2, 3, 0}};
-    v_point4 q;
+    v_point<4> p = {1, 2, 3, 4};
+    v_trans_mul<4> t = {{-1, -1, -1, -1}, {1, 2, 3, 0}};
+    v_point<4> q;
     benchmark::DoNotOptimize(t);
     for (auto _: state) {
         q = t(p);
@@ -76,9 +76,9 @@ static void BM_VTransformMul(benchmark::State& state) {
 BENCHMARK(BM_VTransformMul);
 
 // static void BM_VTransformNeg(benchmark::State& state) {
-//     v_point4 p = {1, 2, 3, 4};
-//     v_trans4_neg t = {{1, 1, 1, 1}, {1, 2, 3, 0}};
-//     v_point4 q;
+//     v_point<4> p = {1, 2, 3, 4};
+//     v_trans_neg<4> t = {{1, 1, 1, 1}, {1, 2, 3, 0}};
+//     v_point<4> q;
 //     // benchmark::DoNotOptimize(t);      // not working
 //     for (auto _: state) {
 //         q = t(p);
