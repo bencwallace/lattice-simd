@@ -6,6 +6,15 @@ template <int N>
 struct v_point;
 
 template <>
+struct v_point<2> {
+    __m128i data;
+
+    v_point() : data(_mm_setzero_si128()) {}
+    v_point(__m128i data) : data(data) {}
+    v_point(int32_t x, int32_t y) : data(_mm_set_epi32(y, x, 0, 0)) {}
+};
+
+template <>
 struct v_point<4> {
     __m128i data;
 
@@ -36,6 +45,21 @@ struct v_trans_mul<4> {
     }
 
     v_point<4> operator()(const v_point<4> &p) const {
+        __m128i temp = _mm_shuffle_epi8(p.data, perm);
+        temp = _mm_mullo_epi32(temp, signs);
+        return temp;
+    }
+};
+
+template <>
+struct v_trans_mul<2> {
+    __m128i signs;
+    __m128i perm;
+
+    v_trans_mul(std::array<int32_t, 2> signs, std::array<uint32_t, 2> perm)
+        : signs(_mm_set_epi32(signs[1], signs[0], 0, 0)), perm(_mm_set_epi32(perm[1], perm[0], 0, 0)) {}
+
+    v_point<2> operator()(const v_point<2> &p) const {
         __m128i temp = _mm_shuffle_epi8(p.data, perm);
         temp = _mm_mullo_epi32(temp, signs);
         return temp;

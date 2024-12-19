@@ -11,24 +11,24 @@ struct s_trans {
     uint32_t perm[N];
 
     s_point<N> permute(const s_point<N> &p) const {
-        s_point<N> q;
-        for (size_t i = 0; i < 4; i++) {
+        s_point<N> q{};
+        for (size_t i = 0; i < 2; i++) {
             q[i] = p[perm[i]];
         }
         return q;
     }
 
     s_point<N> flip(const s_point<N> &p) const {
-        s_point<N> q;
-        for (size_t i = 0; i < 4; i++) {
+        s_point<N> q{};
+        for (size_t i = 0; i < 2; i++) {
             q[i] = p[i] * signs[i];
         }
         return q;
     }
 
     s_point<N> operator()(const s_point<N> &p) const {
-        s_point<N> q;
-        for (size_t i = 0; i < 4; i++) {
+        s_point<N> q{};
+        for (size_t i = 0; i < 2; i++) {
             q[i] = p[perm[i]] * signs[i];
         }
         return q;

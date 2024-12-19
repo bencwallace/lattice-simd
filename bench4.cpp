@@ -65,7 +65,7 @@ BENCHMARK(BM_STransform);
 
 static void BM_VTransformMul(benchmark::State& state) {
     v_point<4> p = {1, 2, 3, 4};
-    v_trans_mul<4> t = {{-1, -1, -1, -1}, {1, 2, 3, 0}};
+    v_trans_mul<4> t = {{-1, -1, -1, -1}, {1, 0, 3, 2}};
     v_point<4> q;
     benchmark::DoNotOptimize(t);
     for (auto _: state) {
