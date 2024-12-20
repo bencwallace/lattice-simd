@@ -18,7 +18,7 @@ TEST(Vector, Equal) {
 
 TEST(Vector, TransformPoint) {
     v_point<4> p = {1, 2, 3, 4};
-    v_trans_mul<4> t = {{-1, 1, -1, 1}, {1, 0, 3, 2}};
+    v_trans<4> t = {{-1, 1, -1, 1}, {1, 0, 3, 2}};
     v_point<4> q = t * p;
     EXPECT_EQ(q, (v_point<4>{-2, 1, -4, 3}));
 }
