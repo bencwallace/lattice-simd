@@ -49,22 +49,20 @@ struct v_trans<4> {
         return iperm;
     }
 
-    static __m128i perm_to_mm(std::array<uint32_t, 4> perm) {
-        return _mm_setr_epi8(
-            perm[0] * 4, perm[0] * 4 + 1, perm[0] * 4 + 2, perm[0] * 4 + 3,
-            perm[1] * 4, perm[1] * 4 + 1, perm[1] * 4 + 2, perm[1] * 4 + 3,
-            perm[2] * 4, perm[2] * 4 + 1, perm[2] * 4 + 2, perm[2] * 4 + 3,
-            perm[3] * 4, perm[3] * 4 + 1, perm[3] * 4 + 2, perm[3] * 4 + 3);
+    static __m128i perm_to_mm_epi32(std::array<uint32_t, 4> perm) {
+        return _mm_setr_epi32(perm[0], perm[1], perm[2], perm[3]);
+        // return _mm_loadu_si128(reinterpret_cast<const __m128i_u *>(perm.data()));
     }
 
     v_trans(std::array<int32_t, 4> signs, std::array<uint32_t, 4> perm)
         : signs(_mm_set_epi32(signs[3], signs[2], signs[1], signs[0])),
-          perm(perm_to_mm(perm)),
-          iperm(perm_to_mm(invert_perm(perm)))
+          perm(perm_to_mm_epi32(perm)),
+          iperm(perm_to_mm_epi32(invert_perm(perm)))
         {}
 
     v_point<4> permute(const v_point<4> &p) const {
-        __m128i temp = _mm_shuffle_epi8(p.data, perm);
+        auto temp1 = _mm_permutevar_ps(_mm_castsi128_ps(p.data), perm);
+        auto temp = _mm_castps_si128(temp1);
         return temp;
     }
 
@@ -74,9 +72,8 @@ struct v_trans<4> {
     }
 
     v_point<4> operator*(const v_point<4> &p) const {
-        __m128i temp = _mm_shuffle_epi8(p.data, iperm);
-        temp = _mm_sign_epi32(temp, signs);
-        return temp;
+        __m128 temp = _mm_permutevar_ps(_mm_castsi128_ps(p.data), iperm);
+        return _mm_sign_epi32(_mm_castps_si128(temp), signs);
     }
 };
 
@@ -86,8 +83,7 @@ struct v_trans<2> : v_trans<4> {
         : v_trans<4>(std::array<int32_t, 4>{signs[0], signs[1], 1, 1}, std::array<uint32_t, 4>{perm[0], perm[1], 2, 3}) {}
 
     v_point<2> operator*(const v_point<2> &p) const {
-        __m128i temp = _mm_shuffle_epi8(p.data, iperm);
-        temp = _mm_sign_epi32(temp, signs);
-        return temp;
+        __m128 temp = _mm_permutevar_ps(_mm_castsi128_ps(p.data), iperm);
+        return _mm_sign_epi32(_mm_castps_si128(temp), signs);
     }
 };
