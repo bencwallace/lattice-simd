@@ -10,6 +10,7 @@ struct v64_trans2 {
     __m64 signs;
     uint32_t perm;
 
+    // TODO: Try defining using bitwise operators and see how gcc's optimizer handles it
     static inline uint64_t rol64_fixed(uint64_t value) {
         __asm__("rolq $32, %0" : "+r" (value));
         return value;
