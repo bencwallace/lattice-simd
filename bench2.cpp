@@ -1,10 +1,8 @@
 #include <benchmark/benchmark.h>
 
 #include "s_trans.h"
-#include "v128_point.h"
-#include "v64_point2.h"
 #include "v64_trans2.h"
-#include "v128_trans.h"
+#include "v128_trans2.h"
 
 static void BM_STransform(benchmark::State& state) {
     s_point<2> p = {1, 2};
@@ -43,9 +41,9 @@ BENCHMARK(BM_STransform);
 // BENCHMARK(BM_VPermute);
 
 static void BM_V128Transform(benchmark::State& state) {
-    v128_point<2> p = {1, 2};
-    v128_trans<2> t = {{-1, 1}, {1, 0}};
-    v128_point<2> q;
+    v128_point2 p = {1, 2};
+    v128_trans2 t = {{-1, 1}, {1, 0}};
+    v128_point2 q;
     benchmark::DoNotOptimize(t);
     for (auto _: state) {
         q = t * p;
