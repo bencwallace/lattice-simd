@@ -17,6 +17,10 @@ Ideas:
 * Transform multiple points simultaneously
 * Transform boxes
 
+## Notes
+
+* Splitting up headers into headers/source significantly impacts performance unless LTO is enabled (`-flto`).
+
 # References
 
 * https://www.codeproject.com/Articles/874396/Crunching-Numbers-with-AVX-and-AVX2
