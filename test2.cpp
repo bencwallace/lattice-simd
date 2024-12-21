@@ -16,11 +16,18 @@ TEST(Vector, Equal) {
     EXPECT_EQ(p, q);
 }
 
+TEST(Vector, FlipPoint) {
+    v_point<2> p = {1, 2};
+    v_trans<2> t = {{-1, 1}, 0};
+    v_point<2> q = t.flip(p);
+    EXPECT_EQ(q, (v_point<2>{-1, 2}));
+}
+
 TEST(Vector, TransformPoint) {
     v_point<2> p = {1, 2};
-    v_trans<2> t = {{1, 1}, {1, 0}};
+    v_trans<2> t = {{1, -1}, true};
     v_point<2> q = t * p;
-    EXPECT_EQ(q, (v_point<2>{2, 1}));
+    EXPECT_EQ(q, (v_point<2>{2, -1}));
 }
 
 int main(int argc, char **argv) {
