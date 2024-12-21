@@ -3,8 +3,8 @@ CXXFLAGS = -Wall -Wextra -Werror -std=c++14 -pedantic -O3 -mavx512vl #-fsanitize
 LDLIBS = -lbenchmark
 GTEST = -lgtest #-lgtest_main -pthread
 
-EXECS := bench2 bench4 test2 test4
-INCLUDES := s_trans.h v_trans.h
+EXECS := bench2 test2
+INCLUDES := s_trans.h v128_trans.h v64_trans2.h
 
 all: $(EXECS) $(EXECS:=.s)
 

@@ -1,7 +1,10 @@
-#include "s_trans.h"
-#include "v_trans.h"
-
 #include <benchmark/benchmark.h>
+
+#include "s_trans.h"
+#include "v128_point.h"
+#include "v64_point2.h"
+#include "v64_trans2.h"
+#include "v128_trans.h"
 
 static void BM_STransform(benchmark::State& state) {
     s_point<2> p = {1, 2};
@@ -39,29 +42,29 @@ BENCHMARK(BM_STransform);
 // }
 // BENCHMARK(BM_VPermute);
 
-static void BM_VTransform(benchmark::State& state) {
-    v_point<2> p = {1, 2};
-    v_trans<2> t = {{-1, 1}, {1, 0}};
-    v_point<2> q;
+static void BM_V128Transform(benchmark::State& state) {
+    v128_point<2> p = {1, 2};
+    v128_trans<2> t = {{-1, 1}, {1, 0}};
+    v128_point<2> q;
     benchmark::DoNotOptimize(t);
     for (auto _: state) {
         q = t * p;
         benchmark::DoNotOptimize(q);
     }
 }
-BENCHMARK(BM_VTransform);
+BENCHMARK(BM_V128Transform);
 
 
-static void BM_VTransformShort(benchmark::State& state) {
-    v_point_short p = {1, 2};
-    v_trans_short t = {{-1, 1}, true};
-    v_point_short q;
+static void BM_V64Transform(benchmark::State& state) {
+    v64_point2 p = {1, 2};
+    v64_trans2 t = {{-1, 1}, true};
+    v64_point2 q;
     benchmark::DoNotOptimize(t);
     for (auto _: state) {
         q = t * p;
         benchmark::DoNotOptimize(q);
     }
 }
-BENCHMARK(BM_VTransformShort);
+BENCHMARK(BM_V64Transform);
 
 BENCHMARK_MAIN();
