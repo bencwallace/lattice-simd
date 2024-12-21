@@ -25,7 +25,7 @@ bench2.s: bench2.cpp Makefile
 	$(CXX) $(CXXFLAGS) -S $< -o $@
 
 test2.s: test2.cpp Makefile
-	$(CXX) $(CXXFLAGS) -S $< -o $@s
+	$(CXX) $(CXXFLAGS) -S $< -o $@
 
 clean:
 	rm -f $(EXECS) *.o *.s

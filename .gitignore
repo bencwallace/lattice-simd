@@ -1,3 +1,5 @@
 *.o
 *.s
-mains
+
+bench2
+test2

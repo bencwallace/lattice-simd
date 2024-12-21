@@ -20,16 +20,6 @@ struct v64_trans2 {
           perm(perm ? 32 : 0)
         {}
 
-    v64_point2 permute(const v64_point2 &p) const {
-        auto temp = rol64_fixed(p.data);
-        return temp;
-    }
-
-    v64_point2 flip(const v64_point2 &p) const {
-        auto temp2 = _mm_sign_pi32(_mm_cvtsi64_m64(p.data), signs);
-        return _mm_cvtm64_si64(temp2);
-    }
-
     v64_point2 operator*(const v64_point2 &p) const {
         uint64_t temp = rol64_fixed(p.data);
         auto temp2 = _mm_sign_pi32(_mm_cvtsi64_m64(temp), signs);
