@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -Wall -Wextra -Werror -std=c++14 -pedantic -O3 -mavx512vl #-fsanitize=alignment
+CXXFLAGS = -Wall -Wextra -Werror -std=c++20 -pedantic -O3 -mavx512vl
 LDLIBS = -lbenchmark -lgtest
 
 EXECS := bench2 test2
