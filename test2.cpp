@@ -4,18 +4,27 @@
 #include "v128_trans2.h"
 #include "v64_trans2.h"
 
-TEST(Scalar, PermutePoint) {
-    s_point<2> p = {1, 2};
-    s_trans<2> t = {{1, -1}, {1, 0}};
-    s_point<2> q = t.permute(p);
-    EXPECT_EQ(q, (s_point<2>{2, 1}));
-}
+TEST(Consistency, TransformPoint) {
+    std::array<int32_t, 2> coords = {1, 2};
+    s_point<2> s_p = coords;
+    v64_point2 v64_p = coords;
+    v128_point2 v128_p = coords;
 
-TEST(Scalar, FlipPoint) {
-    s_point<2> p = {1, 2};
-    s_trans<2> t = {{-1, 1}, {1, 0}};
-    s_point<2> q = t.flip(p);
-    EXPECT_EQ(q, (s_point<2>{-1, 2}));
+    std::array<int32_t, 2> signs = {1, -1};
+    std::array<uint32_t, 2> perm = {1, 0};
+    s_trans<2> s_t = {signs, perm};
+    v64_trans2 v64_t = {signs, perm == std::array<uint32_t, 2>{1, 0}};
+    v128_trans2 v128_t = {signs, perm};
+
+    s_point<2> s_q = s_t * s_p;
+    v64_point2 v64_q = v64_t * v64_p;
+    v128_point2 v128_q = v128_t * v128_p;
+
+    EXPECT_EQ(s_q[0], v64_q[0]);
+    EXPECT_EQ(s_q[1], v64_q[1]);
+
+    EXPECT_EQ(s_q[0], v128_q[0]);
+    EXPECT_EQ(s_q[1], v128_q[1]);
 }
 
 TEST(Scalar, TransformPoint) {
