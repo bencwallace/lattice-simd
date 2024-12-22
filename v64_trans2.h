@@ -8,13 +8,12 @@
 
 #include "v64_point2.h"
 
+// Would be nice to have a more portable version of this using ideas from here:
 // https://stackoverflow.com/questions/776508/best-practices-for-circular-shift-rotate-operations-in-c
-uint64_t rotl (uint64_t x, unsigned int n)
-{
-  const unsigned int mask = CHAR_BIT * sizeof(x) - 1;
-
-  n &= mask;
-  return (x<<n) | (x>>( (-n)&mask ));
+// However, attempts so far have been less performant than the inline assembly version
+static inline uint64_t rol64_fixed(uint64_t value) {
+    __asm__("rolq $32, %0" : "+r" (value));
+    return value;
 }
 
 struct v64_trans2 {
@@ -27,7 +26,7 @@ struct v64_trans2 {
         {}
 
     v64_point2 operator*(const v64_point2 &p) const {
-        uint64_t temp = rotl(p.data, perm);
+        uint64_t temp = rol64_fixed(p.data);
         auto temp2 = _mm_sign_pi32(_mm_cvtsi64_m64(temp), signs);
         return _mm_cvtm64_si64(temp2);
     }
