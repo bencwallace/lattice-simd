@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <immintrin.h>
 
-#include "v128_point2.h"
+#include "v128_point2d.h"
 
 struct v128_trans2 {
     __m128i signs;

@@ -2,7 +2,7 @@ CXX = g++
 CXXFLAGS = -Wall -Wextra -Werror -std=c++14 -pedantic -O3 -mavx512vl
 LDLIBS = -lbenchmark -lgtest
 
-EXECS := bench2 test2
+EXECS := bench2d test2d
 
 all: Makefile $(EXECS) $(EXECS:=.s)
 
@@ -12,19 +12,19 @@ $(EXECS): %: %.o
 %.o: %.cpp %.h Makefile
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-bench2.o: bench2.cpp Makefile
+bench2d.o: bench2d.cpp Makefile
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-test2.o: test2.cpp Makefile
+test2d.o: test2d.cpp Makefile
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 %.s: %.cpp %.h
 	$(CXX) $(CXXFLAGS) -S $< -o $@
 
-bench2.s: bench2.cpp Makefile
+bench2d.s: bench2d.cpp Makefile
 	$(CXX) $(CXXFLAGS) -S $< -o $@
 
-test2.s: test2.cpp Makefile
+test2d.s: test2d.cpp Makefile
 	$(CXX) $(CXXFLAGS) -S $< -o $@
 
 clean:

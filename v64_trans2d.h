@@ -6,7 +6,7 @@
 #include <immintrin.h>
 #include <limits.h>
 
-#include "v64_point2.h"
+#include "v64_point2d.h"
 
 // Would be nice to have a more portable version of this using ideas from here:
 // https://stackoverflow.com/questions/776508/best-practices-for-circular-shift-rotate-operations-in-c

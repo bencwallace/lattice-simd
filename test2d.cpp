@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 
 #include "s_trans.h"
-#include "v128_trans2.h"
-#include "v64_trans2.h"
+#include "v128_trans2d.h"
+#include "v64_trans2d.h"
 
 TEST(Consistency, TransformPoint) {
     std::array<int32_t, 2> coords = {1, 2};

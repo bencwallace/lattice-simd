@@ -1,8 +1,8 @@
 #include <benchmark/benchmark.h>
 
 #include "s_trans.h"
-#include "v64_trans2.h"
-#include "v128_trans2.h"
+#include "v64_trans2d.h"
+#include "v128_trans2d.h"
 
 static void BM_STransform(benchmark::State& state) {
     s_point<2> p = {1, 2};
