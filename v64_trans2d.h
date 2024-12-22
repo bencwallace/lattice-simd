@@ -10,7 +10,8 @@
 
 // Would be nice to have a more portable version of this using ideas from here:
 // https://stackoverflow.com/questions/776508/best-practices-for-circular-shift-rotate-operations-in-c
-// However, attempts so far have been less performant than the inline assembly version
+// However, attempts so far have been less performant than the inline assembly version.
+// For some reason, this is even the case when calling __rolq(p.data, iperm) from <x86intrin.h>.
 static inline uint64_t rol64_fixed(uint64_t value) {
     __asm__("rolq $32, %0" : "+r" (value));
     return value;

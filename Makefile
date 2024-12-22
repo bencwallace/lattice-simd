@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -Wall -Wextra -Werror -std=c++14 -pedantic -O3 -mavx512vl
+CXXFLAGS = -Wall -Wextra -Werror -std=c++14 -pedantic -O3 -mavx -fverbose-asm
 LDLIBS = -lbenchmark -lgtest
 
 EXECS := bench2d test2d
@@ -19,7 +19,7 @@ test2d.o: test2d.cpp Makefile
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 %.s: %.cpp %.h
-	$(CXX) $(CXXFLAGS) -S $< -o $@
+	$(CXX) $(CXXFLAGS) -S $< -o $@ -masm=intel
 
 bench2d.s: bench2d.cpp Makefile
 	$(CXX) $(CXXFLAGS) -S $< -o $@

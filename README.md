@@ -12,7 +12,6 @@ Todo:
 
 Ideas:
 
-* Flip sign with sub or xor instead of mult
 * Transform multiple coordinates simultaneously
 * Transform multiple points simultaneously
 * Transform boxes

@@ -16,6 +16,6 @@ struct v128_point2 {
     }
 
     int32_t operator[](size_t i) const {
-        return _mm_cvtsi128_si32(_mm_srli_si128(data, 4 * i));
+        return _mm_extract_epi32(data, i);
     }
 };
