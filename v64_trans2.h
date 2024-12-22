@@ -18,13 +18,14 @@ static inline uint64_t rol64_fixed(uint64_t value) {
 
 struct v64_trans2 {
     __m64 signs;
-    uint32_t perm;
+    uint32_t iperm;
 
     v64_trans2(std::array<int32_t, 2> signs, bool perm)
         : signs(_mm_setr_pi32(signs[0], signs[1])),
-          perm(perm ? 32 : 0)
+          iperm(perm ? 32 : 0)  // uses iperm == perm in dimension 2
         {}
 
+    // T(p)[i] = S[i] * p[Pinv[i]]
     v64_point2 operator*(const v64_point2 &p) const {
         uint64_t temp = rol64_fixed(p.data);
         auto temp2 = _mm_sign_pi32(_mm_cvtsi64_m64(temp), signs);
