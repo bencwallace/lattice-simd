@@ -1,8 +1,9 @@
 #include <gtest/gtest.h>
 
 #include "s_trans.h"
-#include "v128_trans2d.h"
+#include "v32_trans2d16.h"
 #include "v64_trans2d.h"
+#include "v128_trans2d.h"
 
 TEST(Consistency, TransformPoint) {
     std::array<int32_t, 2> coords = {1, 2};
@@ -32,6 +33,12 @@ TEST(Scalar, TransformPoint) {
     s_trans<2> t = {{1, -1}, {1, 0}};
     s_point<2> q = t * p;
     EXPECT_EQ(q, (s_point<2>{2, -1}));
+}
+
+TEST(Vector32, Coords) {
+    v32_point2d16 p = {1, 2};
+    EXPECT_EQ(p[0], 1);
+    EXPECT_EQ(p[1], 2);
 }
 
 TEST(Vector64, Equal) {
