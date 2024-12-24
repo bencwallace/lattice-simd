@@ -8,19 +8,12 @@
 
 #include "v64_point2d.h"
 
-// Would be nice to have a more portable version of this using ideas from here:
 // https://stackoverflow.com/questions/776508/best-practices-for-circular-shift-rotate-operations-in-c
-// However, attempts so far have been less performant than the inline assembly version.
-// For some reason, this is even the case when calling __rolq(p.data, iperm) from <x86intrin.h>.
-static inline uint64_t rol64_fixed(uint64_t value) {
-    __asm__("rolq $32, %0" : "+r" (value));
-    return value;
-}
-
-// same as above but takes the shift width as an argument
-static inline uint64_t rol64(uint64_t value, uint8_t shift) {
-    __asm__("rolq %1, %0" : "+r" (value) : "c" (shift));
-    return value;
+static inline uint64_t rol64(uint64_t n, uint8_t c)
+{
+  const unsigned int mask = (CHAR_BIT*sizeof(n) - 1);
+  c &= mask;
+  return (n<<c) | (n>>( (-c)&mask ));
 }
 
 struct v64_trans2 {
