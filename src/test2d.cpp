@@ -1,3 +1,4 @@
+#include <random>
 #include <gtest/gtest.h>
 
 #include "s_trans.h"
@@ -5,26 +6,35 @@
 #include "v64_trans2d.h"
 
 TEST(Consistency, TransformPoint) {
-    std::array<int32_t, 2> coords = {1, 2};
-    s_point<2> s_p = coords;
-    v64_point2 v64_p = coords;
-    v128_point2 v128_p = coords;
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<int32_t> dist_coords(-100, 100);
+    std::uniform_int_distribution<int32_t> dist_signs(-1, 1);
 
-    std::array<int32_t, 2> signs = {1, -1};
-    std::array<uint32_t, 2> perm = {1, 0};
-    s_trans<2> s_t = {signs, perm};
-    v64_trans2 v64_t = {signs, perm == std::array<uint32_t, 2>{1, 0}};
-    v128_trans2 v128_t = {signs, perm};
+    for (size_t i = 0; i < 10; ++i) {
+        std::array<int32_t, 2> coords = {dist_coords(gen), dist_coords(gen)};
+        std::array<int32_t, 2> signs = {dist_signs(gen), dist_signs(gen)};
+        std::array<uint32_t, 2> perm = {0, 1};
+        std::random_shuffle(perm.begin(), perm.end());
 
-    s_point<2> s_q = s_t * s_p;
-    v64_point2 v64_q = v64_t * v64_p;
-    v128_point2 v128_q = v128_t * v128_p;
+        s_point<2> s_p = coords;
+        v64_point2 v64_p = coords;
+        v128_point2 v128_p = coords;
 
-    EXPECT_EQ(s_q[0], v64_q[0]);
-    EXPECT_EQ(s_q[1], v64_q[1]);
+        s_trans<2> s_t = {signs, perm};
+        v64_trans2 v64_t = {signs, perm == std::array<uint32_t, 2>{1, 0}};
+        v128_trans2 v128_t = {signs, perm};
 
-    EXPECT_EQ(s_q[0], v128_q[0]);
-    EXPECT_EQ(s_q[1], v128_q[1]);
+        s_point<2> s_q = s_t * s_p;
+        v64_point2 v64_q = v64_t * v64_p;
+        v128_point2 v128_q = v128_t * v128_p;
+
+        EXPECT_EQ(s_q[0], v64_q[0]);
+        EXPECT_EQ(s_q[1], v64_q[1]);
+
+        EXPECT_EQ(s_q[0], v128_q[0]);
+        EXPECT_EQ(s_q[1], v128_q[1]);
+    }
 }
 
 TEST(Scalar, TransformPoint) {
