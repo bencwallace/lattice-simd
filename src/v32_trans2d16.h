@@ -32,39 +32,37 @@ struct v32_point2d16 {
 // where mask = 0xFFFFFFFF or 0xFFFF0000 or 0x0000FFFF,
 // lower = 0 or 1, and upper = 0 or 0x10000
 
-uint32_t cat(int16_t x, int16_t y) { return (int32_t(y) << 16) | uint16_t(x); }
+// // doesn't work if x is 0
+// static inline uint32_t flip_both(uint32_t xy) {
+//   return (xy ^ -1) + (1 << 16) + 1;
+// }
 
-int16_t get(uint32_t xy, size_t i) { return (xy >> (16 * i)) & 0xFFFF; }
+// // doesn't work if x is 0
+// static inline uint32_t flip_low(uint32_t xy) { return (xy ^ uint16_t(-1)) +
+// 1; }
 
-// doesn't work if x is 0
-static inline uint32_t flip_both(uint32_t xy) {
-  return (xy ^ -1) + (1 << 16) + 1;
-}
+// static inline uint32_t flip_high(uint32_t xy) {
+//   return (xy ^ ((-1) << 16)) + (1 << 16);
+// }
 
-// doesn't work if x is 0
-static inline uint32_t flip_low(uint32_t xy) { return (xy ^ uint16_t(-1)) + 1; }
-
-static inline uint32_t flip_high(uint32_t xy) {
-  return (xy ^ ((-1) << 16)) + (1 << 16);
+static inline uint32_t flip(uint32_t xy, uint32_t mask, uint32_t s) {
+  return (xy ^ mask) + s;
 }
 
 struct v32_trans2d16 {
-  std::array<int32_t, 2> signs;
+  uint32_t mask;
+  uint32_t s;
   uint8_t iperm;
 
   v32_trans2d16(std::array<int32_t, 2> signs, bool perm)
-      : signs(signs), iperm(perm ? 16 : 0) {}
+      : mask((signs[0] == -1 ? uint16_t(-1) : 0) +
+             (signs[1] == -1 ? (-1) << 16 : 0)),
+        s((signs[0] == -1 ? 1 : 0) + (signs[1] == -1 ? 1 << 16 : 0)),
+        iperm(perm ? 16 : 0) {}
 
   v32_point2d16 operator*(const v32_point2d16 p) const {
     uint32_t temp = rol32(p.data, iperm);
-    if (signs[0] == -1 && signs[1] == -1) {
-      return flip_both(temp);
-    } else if (signs[0] == -1) {
-      return flip_low(temp);
-    } else if (signs[1] == -1) {
-      return flip_high(temp);
-    }
-    return temp;
+    return flip(temp, mask, s);
   }
 };
 
