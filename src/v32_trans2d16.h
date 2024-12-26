@@ -45,8 +45,19 @@ struct v32_point2d16 {
 //   return (xy ^ ((-1) << 16)) + (1 << 16);
 // }
 
+// static inline uint32_t flip(uint32_t xy, uint32_t mask, uint32_t s) {
+//   return (xy ^ mask) + s;
+// }
+
 static inline uint32_t flip(uint32_t xy, uint32_t mask, uint32_t s) {
-  return (xy ^ mask) + s;
+  xy ^= mask;
+  uint16_t lo = xy & 0x0000FFFF;
+  uint16_t so = s & 0x0000FFFF;
+
+  uint32_t hi = xy & 0xFFFF0000;
+  uint32_t si = s & 0xFFFF0000;
+
+  return (hi + si) | uint32_t(lo + so);
 }
 
 struct v32_trans2d16 {
