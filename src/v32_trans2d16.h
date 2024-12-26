@@ -1,12 +1,27 @@
+#include <array>
 #include <cstddef>
 #include <cstdint>
+#include <limits.h>
+
+static inline uint64_t rol32(uint32_t n, uint8_t c) {
+  const unsigned int mask = (CHAR_BIT * sizeof(n) - 1);
+  c &= mask;
+  return (n << c) | (n >> ((-c) & mask));
+}
 
 struct v32_point2d16 {
   uint32_t data;
 
+  v32_point2d16(uint32_t data) : data(data) {}
   v32_point2d16(int16_t x, int16_t y)
       : data((uint32_t(y) << 16) | uint16_t(x)) {}
+  v32_point2d16(std::array<int32_t, 2> coords)
+      : v32_point2d16(coords[0], coords[1]) {}
+  v32_point2d16() : v32_point2d16(0, 0) {}
 
+  bool operator==(const v32_point2d16 &other) const {
+    return data == other.data;
+  }
   int16_t operator[](size_t i) const { return (data >> (16 * i)) & 0xFFFF; }
 };
 
@@ -34,9 +49,22 @@ static inline uint32_t flip_high(uint32_t xy) {
 }
 
 struct v32_trans2d16 {
+  std::array<int32_t, 2> signs;
+  uint8_t iperm;
+
+  v32_trans2d16(std::array<int32_t, 2> signs, bool perm)
+      : signs(signs), iperm(perm ? 16 : 0) {}
+
   v32_point2d16 operator*(const v32_point2d16 p) const {
-    // TODO
-    return v32_point2d16(p[1], p[0]);
+    uint32_t temp = rol32(p.data, iperm);
+    if (signs[0] == -1 && signs[1] == -1) {
+      return flip_both(temp);
+    } else if (signs[0] == -1) {
+      return flip_low(temp);
+    } else if (signs[1] == -1) {
+      return flip_high(temp);
+    }
+    return temp;
   }
 };
 
