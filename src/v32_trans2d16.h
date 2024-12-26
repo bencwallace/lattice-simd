@@ -32,23 +32,13 @@ struct v32_point2d16 {
 // where mask = 0xFFFFFFFF or 0xFFFF0000 or 0x0000FFFF,
 // lower = 0 or 1, and upper = 0 or 0x10000
 
-// // doesn't work if x is 0
-// static inline uint32_t flip_both(uint32_t xy) {
-//   return (xy ^ -1) + (1 << 16) + 1;
-// }
+// flawed (when x or y is 0) but compiles to 3 instructions similar to
+// those outlined above
+static inline uint32_t flip(uint32_t xy, uint32_t mask, uint32_t s) {
+  return (xy ^ mask) + s;
+}
 
-// // doesn't work if x is 0
-// static inline uint32_t flip_low(uint32_t xy) { return (xy ^ uint16_t(-1)) +
-// 1; }
-
-// static inline uint32_t flip_high(uint32_t xy) {
-//   return (xy ^ ((-1) << 16)) + (1 << 16);
-// }
-
-// static inline uint32_t flip(uint32_t xy, uint32_t mask, uint32_t s) {
-//   return (xy ^ mask) + s;
-// }
-
+// compiles to more instructions -- take a closer look at these
 static inline uint32_t flip(uint32_t xy, uint32_t mask, uint32_t s) {
   xy ^= mask;
   uint16_t lo = xy & 0x0000FFFF;
