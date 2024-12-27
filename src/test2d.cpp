@@ -9,7 +9,8 @@ TEST(Consistency, TransformPoint) {
   std::random_device rd;
   std::mt19937 gen(rd());
   std::uniform_int_distribution<int32_t> dist_coords(-100, 100);
-  std::uniform_int_distribution<int32_t> dist_signs(-1, 1);
+  std::uniform_int_distribution<int32_t> dist_signs(
+      -1, 1); // TODO: this is wrong (or at least more general than my use case)
 
   for (size_t i = 0; i < 10; ++i) {
     std::array<int32_t, 2> coords = {dist_coords(gen), dist_coords(gen)};
@@ -34,6 +35,35 @@ TEST(Consistency, TransformPoint) {
 
     EXPECT_EQ(s_q[0], v128_q[0]);
     EXPECT_EQ(s_q[1], v128_q[1]);
+  }
+}
+
+TEST(Consistency, Compose) {
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_int_distribution<int32_t> dist_signs(0, 1);
+
+  for (size_t i = 0; i < 10; ++i) {
+    std::array<int32_t, 2> signs1 = {2 * dist_signs(gen) - 1,
+                                     2 * dist_signs(gen) - 1};
+    std::array<int32_t, 2> signs2 = {2 * dist_signs(gen) - 1,
+                                     2 * dist_signs(gen) - 1};
+    std::array<uint32_t, 2> perm1 = {0, 1};
+    std::array<uint32_t, 2> perm2 = {0, 1};
+    std::random_shuffle(perm1.begin(), perm1.end());
+    std::random_shuffle(perm2.begin(), perm2.end());
+
+    s_trans<2> s_t1 = {signs1, perm1};
+    s_trans<2> s_t2 = {signs2, perm2};
+    v128_trans2 v128_t1 = {signs1, perm1};
+    v128_trans2 v128_t2 = {signs2, perm2};
+
+    s_trans<2> s_t = s_t1 * s_t2;
+    v128_trans2 v128_t = v128_t1 * v128_t2;
+
+    auto temp1 = std::pair{s_t.signs[0], s_t.perm[0]};
+    auto temp2 = v128_t[0];
+    EXPECT_EQ(temp1, temp2);
   }
 }
 

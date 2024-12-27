@@ -15,4 +15,14 @@ template <int N> struct s_trans {
     }
     return q;
   }
+
+  s_trans<N> operator*(const s_trans<N> &t) const {
+    std::array<int32_t, N> new_signs{};
+    std::array<uint32_t, N> new_perm{};
+    for (size_t i = 0; i < N; i++) {
+      new_perm[i] = perm[t.perm[i]];
+      new_signs[new_perm[i]] = signs[new_perm[i]] * t.signs[t.perm[i]];
+    }
+    return {new_signs, new_perm};
+  }
 };
