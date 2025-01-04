@@ -12,7 +12,7 @@ struct v128_trans2 {
 
   v128_trans2(__m128i signs, __m128i perm) : signs(signs), perm(perm) {}
   v128_trans2(std::array<int32_t, 2> signs, std::array<uint32_t, 2> perm)
-      : signs(_mm_set_epi32(1, 1, signs[1], signs[0])),
+      : signs(_mm_setr_epi32(signs[0], signs[1], 1, 1)),
         perm(_mm_setr_epi32(perm[0], perm[1], 2, 3)) {}
 
   std::pair<int32_t, uint32_t> operator[](size_t i) const {
