@@ -146,10 +146,6 @@ TEST(Vector128, TransformBox) {
   v128_box2 c = t * b;
   EXPECT_EQ(c[0], v128_interval({3, 4}));
   EXPECT_EQ(c[1], v128_interval({1, 3}));
-  // EXPECT_EQ(c[0], 1);
-  // EXPECT_EQ(c[1], 3);
-  // EXPECT_EQ(c[2], 3);
-  // EXPECT_EQ(c[3], 4);
 }
 
 int main(int argc, char **argv) {

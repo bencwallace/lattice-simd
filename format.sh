@@ -2,7 +2,7 @@
 
 set -e
 
-if [ "$1" = "--inplace" ]; then
+if [ "$1" = "-i" ]; then
     FLAG="-i"
 else
     FLAG="-n --Werror"
