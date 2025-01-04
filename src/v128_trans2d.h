@@ -6,14 +6,26 @@
 
 #include "v128_point2d.h"
 
+struct v128_interval {
+  int32_t left;
+  int32_t right;
+
+  bool operator==(const v128_interval &other) const {
+    return left == other.left && right == other.right;
+  }
+};
+
 struct v128_box2 {
   __m128i data; // x_min, y_min, x_max, y_max
 
   v128_box2(__m128i data) : data(data) {}
-  v128_box2(std::array<int32_t, 4> coords)
-      : data(_mm_setr_epi32(coords[0], coords[1], coords[2], coords[3])) {}
+  v128_box2(std::array<v128_interval, 2> intervals)
+      : data(_mm_setr_epi32(intervals[0].left, intervals[1].left,
+                            intervals[0].right, intervals[1].right)) {}
 
-  int32_t operator[](size_t i) const { return _mm_extract_epi32(data, i); }
+  v128_interval operator[](size_t i) const {
+    return {_mm_extract_epi32(data, i), _mm_extract_epi32(data, i + 2)};
+  }
 };
 
 struct v128_trans2 {
@@ -52,7 +64,8 @@ struct v128_trans2 {
     __m128i minima = _mm_min_epi32(temp1, temp2);
     __m128i maxima = _mm_max_epi32(temp1, temp2);
     return _mm_blend_epi32(
-        minima, maxima,
-        0b1010); // TODO: this mask works even though I feel like it shouldn't
+        minima, maxima, 0b0101
+        // 0b1010  // TODO: this mask works even though I feel like it shouldn't
+    );
   }
 };
