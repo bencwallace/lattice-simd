@@ -82,4 +82,38 @@ template <bool OptimizeT> static void BM_V128Compose(benchmark::State &state) {
 BENCHMARK_TEMPLATE(BM_SCompose, false);
 BENCHMARK_TEMPLATE(BM_SCompose, true);
 
+template <bool OptimizeT>
+static void BM_STransformBox(benchmark::State &state) {
+  auto b = s_box<2>({s_interval{1, 3}, s_interval{3, 4}});
+  s_trans<2> t = {{1, 1}, {1, 0}};
+  s_box<2> c;
+  if constexpr (!OptimizeT) {
+    benchmark::DoNotOptimize(b);
+    benchmark::DoNotOptimize(t);
+  }
+  for (auto _ : state) {
+    c = t * b;
+    benchmark::DoNotOptimize(c);
+  }
+}
+BENCHMARK_TEMPLATE(BM_STransformBox, false);
+BENCHMARK_TEMPLATE(BM_STransformBox, true);
+
+template <bool OptimizeT>
+static void BM_V128TransformBox(benchmark::State &state) {
+  auto b = v128_box2({v128_interval{1, 3}, v128_interval{3, 4}});
+  v128_trans2 t = {{1, 1}, {1, 0}};
+  v128_box2 c;
+  if constexpr (!OptimizeT) {
+    benchmark::DoNotOptimize(b);
+    benchmark::DoNotOptimize(t);
+  }
+  for (auto _ : state) {
+    c = t * b;
+    benchmark::DoNotOptimize(c);
+  }
+}
+BENCHMARK_TEMPLATE(BM_V128TransformBox, false);
+BENCHMARK_TEMPLATE(BM_V128TransformBox, true);
+
 BENCHMARK_MAIN();

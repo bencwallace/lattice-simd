@@ -18,6 +18,7 @@ struct v128_interval {
 struct v128_box2 {
   __m128i data; // x_min, y_min, x_max, y_max
 
+  v128_box2() : data(_mm_setzero_si128()) {}
   v128_box2(__m128i data) : data(data) {}
   v128_box2(std::array<v128_interval, 2> intervals)
       : data(_mm_setr_epi32(intervals[0].left, intervals[1].left,

@@ -20,6 +20,7 @@ struct s_interval {
 template <int N> struct s_box {
   std::array<s_interval, N> intervals;
 
+  s_box() = default;
   s_box(std::array<s_interval, N> intervals) : intervals(intervals) {}
 
   s_interval operator[](size_t i) const { return intervals[i]; }
