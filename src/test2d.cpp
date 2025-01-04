@@ -100,6 +100,16 @@ TEST(Vector128, TransformPoint) {
   EXPECT_EQ(q, (v128_point2{2, -1}));
 }
 
+TEST(Vector128, TransformBox) {
+  v128_box2 b = {{1, 3, 3, 4}};
+  v128_trans2 t = {{1, 1}, {1, 0}};
+  v128_box2 c = t * b;
+  EXPECT_EQ(c[0], 1);
+  EXPECT_EQ(c[1], 3);
+  EXPECT_EQ(c[2], 3);
+  EXPECT_EQ(c[3], 4);
+}
+
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();

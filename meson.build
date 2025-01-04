@@ -7,5 +7,5 @@ project(
         'buildtype=release',
     ],
 )
-add_project_arguments('-mavx', language: 'cpp')
+add_project_arguments('-mavx2', language: 'cpp')
 subdir('src')
