@@ -21,9 +21,9 @@ BENCHMARK_TEMPLATE(BM_STransform, true);
 
 template <bool OptimizeT>
 static void BM_V128Transform(benchmark::State &state) {
-  v128_point2 p = {1, 2};
-  v128_trans2 t = {{-1, 1}, {1, 0}};
-  v128_point2 q;
+  v128_point2d p = {1, 2};
+  v128_trans2d t = {{-1, 1}, {1, 0}};
+  v128_point2d q;
   if constexpr (!OptimizeT) {
     benchmark::DoNotOptimize(t);
   }
@@ -36,9 +36,9 @@ BENCHMARK_TEMPLATE(BM_V128Transform, false);
 BENCHMARK_TEMPLATE(BM_V128Transform, true);
 
 template <bool OptimizeT> static void BM_V64Transform(benchmark::State &state) {
-  v64_point2 p = {1, 2};
-  v64_trans2 t = {{-1, 1}, true};
-  v64_point2 q;
+  v64_point2d p = {1, 2};
+  v64_trans2d t = {{-1, 1}, true};
+  v64_point2d q;
   if constexpr (!OptimizeT) {
     benchmark::DoNotOptimize(t);
   }
@@ -67,9 +67,9 @@ BENCHMARK_TEMPLATE(BM_SCompose, false);
 BENCHMARK_TEMPLATE(BM_SCompose, true);
 
 template <bool OptimizeT> static void BM_V128Compose(benchmark::State &state) {
-  v128_trans2 t1 = {{-1, -1}, {1, 0}};
-  v128_trans2 t2 = {{-1, 1}, {0, 1}};
-  v128_trans2 t;
+  v128_trans2d t1 = {{-1, -1}, {1, 0}};
+  v128_trans2d t2 = {{-1, 1}, {0, 1}};
+  v128_trans2d t;
   if constexpr (!OptimizeT) {
     benchmark::DoNotOptimize(t1);
     benchmark::DoNotOptimize(t2);
@@ -101,9 +101,9 @@ BENCHMARK_TEMPLATE(BM_STransformBox, true);
 
 template <bool OptimizeT>
 static void BM_V128TransformBox(benchmark::State &state) {
-  auto b = v128_box2({v128_interval{1, 3}, v128_interval{3, 4}});
-  v128_trans2 t = {{1, 1}, {1, 0}};
-  v128_box2 c;
+  auto b = v128_box2d({v128_interval{1, 3}, v128_interval{3, 4}});
+  v128_trans2d t = {{1, 1}, {1, 0}};
+  v128_box2d c;
   if constexpr (!OptimizeT) {
     benchmark::DoNotOptimize(b);
     benchmark::DoNotOptimize(t);
