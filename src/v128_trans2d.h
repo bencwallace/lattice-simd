@@ -40,6 +40,10 @@ inline __m128i sort_bounds(__m128i pairs) {
   return _mm_blend_epi32(minima, maxima, 0b1100);
 }
 
+inline __m128i permutevar_epi32(__m128i data, __m128i perm) {
+  return _mm_castps_si128(_mm_permutevar_ps(_mm_castsi128_ps(data), perm));
+}
+
 struct v128_trans2d {
   __m128i signs;
   __m128i perm;
@@ -59,23 +63,17 @@ struct v128_trans2d {
   }
 
   v128_point2d operator*(const v128_point2d &p) const {
-    __m128 temp = _mm_permutevar_ps(_mm_castsi128_ps(p.data), perm);
-    return _mm_sign_epi32(_mm_castps_si128(temp), signs);
+    return _mm_sign_epi32(permutevar_epi32(p.data, perm), signs);
   }
 
   v128_trans2d operator*(const v128_trans2d &t) {
-    __m128i new_perm =
-        _mm_castps_si128(_mm_permutevar_ps(_mm_castsi128_ps(perm), t.perm));
-    __m128i new_signs = _mm_sign_epi32(
-        _mm_castps_si128(_mm_permutevar_ps(_mm_castsi128_ps(t.signs), perm)),
-        signs);
+    __m128i new_perm = permutevar_epi32(perm, t.perm);
+    __m128i new_signs = _mm_sign_epi32(permutevar_epi32(t.signs, perm), signs);
     return {new_signs, new_perm};
   }
 
   v128_box2d operator*(const v128_box2d &b) const {
-    __m128i pairs = _mm_sign_epi32(
-        _mm_castps_si128(_mm_permutevar_ps(_mm_castsi128_ps(b.data), perm)),
-        signs);
+    __m128i pairs = _mm_sign_epi32(permutevar_epi32(b.data, perm), signs);
     return sort_bounds(pairs);
   }
 };
