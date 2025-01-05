@@ -9,12 +9,12 @@ TEST(Consistency, TransformPoint) {
   std::random_device rd;
   std::mt19937 gen(rd());
   std::uniform_int_distribution<int32_t> dist_coords(-100, 100);
-  std::uniform_int_distribution<int32_t> dist_signs(
-      -1, 1); // TODO: this is wrong (or at least more general than my use case)
+  std::uniform_int_distribution<int32_t> dist_signs(0, 1);
 
   for (size_t i = 0; i < 10; ++i) {
     std::array<int32_t, 2> coords = {dist_coords(gen), dist_coords(gen)};
-    std::array<int32_t, 2> signs = {dist_signs(gen), dist_signs(gen)};
+    std::array<int32_t, 2> signs = {2 * dist_signs(gen) - 1,
+                                    2 * dist_signs(gen) - 1};
     std::array<uint32_t, 2> perm = {0, 1};
     std::random_shuffle(perm.begin(), perm.end());
 
