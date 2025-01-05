@@ -3,6 +3,21 @@
 #include <array>
 #include <immintrin.h>
 
+static inline uint32_t extract_epi32(__m128i data, size_t i) {
+  switch (i) {
+  case 0:
+    return _mm_extract_epi32(data, 0);
+  case 1:
+    return _mm_extract_epi32(data, 1);
+  case 2:
+    return _mm_extract_epi32(data, 2);
+  case 3:
+    return _mm_extract_epi32(data, 3);
+  default:
+    return 0;
+  }
+}
+
 struct v128_point2 {
   __m128i data;
 
@@ -16,5 +31,5 @@ struct v128_point2 {
     return _mm_movemask_epi8(_mm_cmpeq_epi32(data, other.data)) == 0xFFFF;
   }
 
-  int32_t operator[](size_t i) const { return _mm_extract_epi32(data, i); }
+  int32_t operator[](size_t i) const { return extract_epi32(data, i); }
 };
