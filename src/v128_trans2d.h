@@ -44,6 +44,7 @@ struct v128_trans2d {
   __m128i signs;
   __m128i perm;
 
+  v128_trans2d() : signs(_mm_set1_epi32(1)), perm(_mm_setr_epi32(0, 1, 2, 3)) {}
   v128_trans2d(__m128i signs, __m128i perm) : signs(signs), perm(perm) {}
 
   // Since only two elements of each array are used, there are multiple possible
