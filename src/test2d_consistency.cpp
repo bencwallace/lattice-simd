@@ -5,6 +5,23 @@
 #include "v128_trans2d.h"
 #include "v64_trans2d.h"
 
+TEST(Consistency, AddPoints) {
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_int_distribution<int32_t> dist_coords(-100, 100);
+
+  s_point<2> s_p = {dist_coords(gen), dist_coords(gen)};
+  s_point<2> s_q = {dist_coords(gen), dist_coords(gen)};
+  v128_point2d v128_p = {s_p[0], s_p[1]};
+  v128_point2d v128_q = {s_q[0], s_q[1]};
+
+  s_point<2> s_r = s_p + s_q;
+  v128_point2d v128_r = v128_p + v128_q;
+
+  EXPECT_EQ(s_r[0], v128_r[0]);
+  EXPECT_EQ(s_r[1], v128_r[1]);
+}
+
 TEST(Consistency, TransformPoint) {
   std::random_device rd;
   std::mt19937 gen(rd());
@@ -64,6 +81,33 @@ TEST(Consistency, Compose) {
     auto temp1 = std::pair{s_t.signs[0], s_t.perm[0]};
     auto temp2 = v128_t[0];
     EXPECT_EQ(temp1, temp2);
+  }
+}
+
+TEST(Consistency, TranslateBox) {
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_int_distribution<int32_t> dist_coords(-100, 100);
+
+  for (size_t i = 0; i < 10; ++i) {
+    s_point<2> s_p = {dist_coords(gen), dist_coords(gen)};
+    v128_point2d v128_p = {s_p[0], s_p[1]};
+
+    std::array<int32_t, 4> coords = {dist_coords(gen), dist_coords(gen),
+                                     dist_coords(gen), dist_coords(gen)};
+    std::array<int32_t, 2> interval1 = {std::min(coords[0], coords[1]),
+                                        std::max(coords[0], coords[1])};
+    std::array<int32_t, 2> interval2 = {std::min(coords[2], coords[3]),
+                                        std::max(coords[2], coords[3])};
+    auto s_b = s_box<2>({s_interval{interval1[0], interval1[1]},
+                         s_interval{interval2[0], interval2[1]}});
+    auto v128_b = v128_box2d({v128_interval{interval1[0], interval1[1]},
+                              v128_interval{interval2[0], interval2[1]}});
+
+    s_box<2> s_c = s_b + s_p;
+    v128_box2d v128_c = v128_b + v128_p;
+    EXPECT_EQ(s_c[0], v128_c[0]);
+    EXPECT_EQ(s_c[1], v128_c[1]);
   }
 }
 

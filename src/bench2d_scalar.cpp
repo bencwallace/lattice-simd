@@ -2,6 +2,20 @@
 
 #include "s_trans.h"
 
+static void BM_SAddPoints(benchmark::State &state) {
+  s_point<2> p = {1, 2};
+  s_point<2> q = {3, 4};
+  benchmark::DoNotOptimize(p);
+  benchmark::DoNotOptimize(q);
+
+  s_point<2> r;
+  for (auto _ : state) {
+    r = p + q;
+    benchmark::DoNotOptimize(r);
+  }
+}
+BENCHMARK(BM_SAddPoints);
+
 static void BM_STransform(benchmark::State &state) {
   s_point<2> p = {1, 2};
   s_trans<2> t = {{-1, -1}, {1, 0}};
@@ -28,6 +42,20 @@ static void BM_SCompose(benchmark::State &state) {
   }
 }
 BENCHMARK(BM_SCompose);
+
+static void BM_STranslateBox(benchmark::State &state) {
+  auto b = s_box<2>({s_interval{1, 3}, s_interval{3, 4}});
+  s_point<2> p = {1, 2};
+  benchmark::DoNotOptimize(b);
+  benchmark::DoNotOptimize(p);
+
+  s_box<2> c;
+  for (auto _ : state) {
+    c = b + p;
+    benchmark::DoNotOptimize(c);
+  }
+}
+BENCHMARK(BM_STranslateBox);
 
 static void BM_STransformBox(benchmark::State &state) {
   auto b = s_box<2>({s_interval{1, 3}, s_interval{3, 4}});

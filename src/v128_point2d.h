@@ -32,4 +32,8 @@ struct v128_point2d {
   }
 
   int32_t operator[](size_t i) const { return extract_epi32(data, i); }
+
+  v128_point2d operator+(const v128_point2d &other) const {
+    return _mm_add_epi32(data, other.data);
+  }
 };
