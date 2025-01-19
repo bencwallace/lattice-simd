@@ -28,6 +28,11 @@ struct v128_box2d {
     return {int32_t(extract_epi32(data, i)),
             int32_t(extract_epi32(data, i + 2))};
   }
+
+  v128_box2d operator+(const v128_point2d &p) const {
+    __m128i offset = _mm_shuffle_epi32(p.data, _MM_SHUFFLE(1, 0, 1, 0));
+    return _mm_add_epi32(data, offset);
+  }
 };
 
 // Given a vector (a, b, c, d) representing potentially unsorted intervals
@@ -44,6 +49,8 @@ inline __m128i permutevar_epi32(__m128i data, __m128i perm) {
   return _mm_castps_si128(_mm_permutevar_ps(_mm_castsi128_ps(data), perm));
 }
 
+// Note that many of the implementations below conflate the permutation and the
+// inverse permutation since these are identical in 2 dimensions.
 struct v128_trans2d {
   __m128i signs;
   __m128i perm;

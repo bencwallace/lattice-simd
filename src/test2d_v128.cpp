@@ -16,6 +16,14 @@ TEST(Vector128, TransformPoint) {
   EXPECT_EQ(q, (v128_point2d{2, -1}));
 }
 
+TEST(Vector128, TranslateBox) {
+  auto b = v128_box2d({v128_interval{1, 3}, v128_interval{3, 4}});
+  v128_point2d p = {1, 2};
+  v128_box2d c = b + p;
+  EXPECT_EQ(c[0], v128_interval({2, 4}));
+  EXPECT_EQ(c[1], v128_interval({5, 6}));
+}
+
 TEST(Vector128, TransformBox) {
   auto b = v128_box2d({v128_interval{1, 3}, v128_interval{3, 4}});
   v128_trans2d t = {{1, 1}, {1, 0}};

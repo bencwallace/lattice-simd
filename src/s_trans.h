@@ -2,7 +2,16 @@
 #include <cstddef>
 #include <cstdint>
 
-template <int N> using s_point = std::array<int32_t, N>;
+template <size_t N> using s_point = std::array<int32_t, N>;
+
+template <size_t N>
+s_point<N> operator+(const s_point<N> a, const s_point<N> b) {
+  s_point<N> c{};
+  for (size_t i = 0; i < N; i++) {
+    c[i] = a[i] + b[i];
+  }
+  return c;
+}
 
 struct s_interval {
   int32_t left;
@@ -17,16 +26,24 @@ struct s_interval {
   }
 };
 
-template <int N> struct s_box {
+template <size_t N> struct s_box {
   std::array<s_interval, N> intervals;
 
   s_box() = default;
   s_box(std::array<s_interval, N> intervals) : intervals(intervals) {}
 
   s_interval operator[](size_t i) const { return intervals[i]; }
+
+  s_box operator+(const s_point<N> &p) const {
+    std::array<s_interval, N> new_intervals{};
+    for (size_t i = 0; i < N; i++) {
+      new_intervals[i] = {intervals[i].left + p[i], intervals[i].right + p[i]};
+    }
+    return {new_intervals};
+  }
 };
 
-template <int N> struct s_trans {
+template <size_t N> struct s_trans {
   std::array<int32_t, N> signs;
   std::array<uint32_t, N> perm;
 

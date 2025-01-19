@@ -10,6 +10,14 @@ TEST(Scalar, TransformPoint) {
   EXPECT_EQ(q, (s_point<2>{2, -1}));
 }
 
+TEST(Scalar, TranslateBox) {
+  auto b = s_box<2>({s_interval{1, 3}, s_interval{3, 4}});
+  s_point<2> p = {1, 2};
+  s_box<2> c = b + p;
+  EXPECT_EQ(c[0], s_interval({2, 4}));
+  EXPECT_EQ(c[1], s_interval({5, 6}));
+}
+
 TEST(Scalar, TransformBox) {
   auto b = s_box<2>({s_interval{1, 3}, s_interval{3, 4}});
   s_trans<2> t = {{1, 1}, {1, 0}};
