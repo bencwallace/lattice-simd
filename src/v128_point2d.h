@@ -36,4 +36,10 @@ struct v128_point2d {
   v128_point2d operator+(const v128_point2d &other) const {
     return _mm_add_epi32(data, other.data);
   }
+
+  static v128_point2d unit() { return v128_point2d(1, 0); }
 };
+
+v128_point2d operator*(int k, const v128_point2d &p) {
+  return _mm_mullo_epi32(_mm_set1_epi32(k), p.data);
+}
