@@ -16,6 +16,20 @@ static void BM_SAddPoints(benchmark::State &state) {
 }
 BENCHMARK(BM_SAddPoints);
 
+static void BM_V128Union(benchmark::State &state) {
+  auto box1 = s_box<2>({s_interval{1, 3}, s_interval{3, 5}});
+  auto box2 = s_box<2>({s_interval{2, 4}, s_interval{2, 4}});
+  benchmark::DoNotOptimize(box1);
+  benchmark::DoNotOptimize(box2);
+
+  s_box<2> box;
+  for (auto _ : state) {
+    box = box1 | box2;
+    benchmark::DoNotOptimize(box);
+  }
+}
+BENCHMARK(BM_V128Union);
+
 static void BM_STransform(benchmark::State &state) {
   s_point<2> p = {1, 2};
   s_trans<2> t = {{-1, -1}, {1, 0}};
