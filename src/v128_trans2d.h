@@ -42,6 +42,13 @@ struct v128_box2d {
     __m128i maxs = _mm_max_epi32(data, b.data);
     return _mm_blend_epi32(mins, maxs, 0b1100);
   }
+
+  v128_box2d operator&(const v128_box2d &b) const {
+    // TODO: See comment under `operator|`
+    __m128i mins = _mm_min_epi32(data, b.data);
+    __m128i maxs = _mm_max_epi32(data, b.data);
+    return _mm_blend_epi32(mins, maxs, 0b0011);
+  }
 };
 
 // Given a vector (a, b, c, d) representing potentially unsorted intervals

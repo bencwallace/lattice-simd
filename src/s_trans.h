@@ -50,6 +50,15 @@ template <size_t N> struct s_box {
     }
     return {new_intervals};
   }
+
+  s_box operator&(const s_box<N> &b) const {
+    std::array<s_interval, N> new_intervals{};
+    for (size_t i = 0; i < N; i++) {
+      new_intervals[i] = {std::max(intervals[i].left, b.intervals[i].left),
+                          std::min(intervals[i].right, b.intervals[i].right)};
+    }
+    return {new_intervals};
+  }
 };
 
 template <size_t N> struct s_trans {
