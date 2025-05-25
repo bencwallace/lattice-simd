@@ -33,6 +33,15 @@ struct v128_box2d {
     __m128i offset = _mm_shuffle_epi32(p.data, _MM_SHUFFLE(1, 0, 1, 0));
     return _mm_add_epi32(data, offset);
   }
+
+  v128_box2d operator|(const v128_box2d &b) const {
+    // TODO: Look into using `_mm_maskz_{min,max}_epi32`
+    // For example: `__m128i mins = _mm_min_epi32(0b0011, data, b.data)`
+    // For now, benchmarks are crashing when I enable AVX512 in the build
+    __m128i mins = _mm_min_epi32(data, b.data);
+    __m128i maxs = _mm_max_epi32(data, b.data);
+    return _mm_blend_epi32(mins, maxs, 0b1100);
+  }
 };
 
 // Given a vector (a, b, c, d) representing potentially unsorted intervals

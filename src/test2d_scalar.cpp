@@ -10,6 +10,22 @@ TEST(Scalar, TransformPoint) {
   EXPECT_EQ(q, (s_point<2>{2, -1}));
 }
 
+TEST(Scalar, Union1) {
+  auto box1 = s_box<2>({s_interval{1, 3}, s_interval{3, 5}});
+  auto box2 = s_box<2>({s_interval{2, 4}, s_interval{2, 4}});
+  s_box<2> box = box1 | box2;
+  EXPECT_EQ(box[0], s_interval({1, 4}));
+  EXPECT_EQ(box[1], s_interval({2, 5}));
+}
+
+TEST(Scalar, Union2) {
+  auto box1 = s_box<2>({s_interval{-1, 5}, s_interval{-2, -1}});
+  auto box2 = s_box<2>({s_interval{2, 4}, s_interval{-1, 0}});
+  s_box<2> box = box1 | box2;
+  EXPECT_EQ(box[0], s_interval({-1, 5}));
+  EXPECT_EQ(box[1], s_interval({-2, 0}));
+}
+
 TEST(Scalar, TranslateBox) {
   auto b = s_box<2>({s_interval{1, 3}, s_interval{3, 4}});
   s_point<2> p = {1, 2};

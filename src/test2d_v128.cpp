@@ -9,6 +9,22 @@ TEST(Vector128, Equal) {
   EXPECT_EQ(p, q);
 }
 
+TEST(Vector128, Union1) {
+  v128_box2d box1({v128_interval{1, 3}, v128_interval{3, 5}});
+  v128_box2d box2({v128_interval{2, 4}, v128_interval{2, 4}});
+  v128_box2d box = box1 | box2;
+  EXPECT_EQ(box[0], v128_interval({1, 4}));
+  EXPECT_EQ(box[1], v128_interval({2, 5}));
+}
+
+TEST(Vector128, Union2) {
+  v128_box2d box1({v128_interval{-1, 5}, v128_interval{-2, -1}});
+  v128_box2d box2({v128_interval{2, 4}, v128_interval{-1, 0}});
+  v128_box2d box = box1 | box2;
+  EXPECT_EQ(box[0], v128_interval({-1, 5}));
+  EXPECT_EQ(box[1], v128_interval({-2, 0}));
+}
+
 TEST(Vector128, TransformPoint) {
   v128_point2d p = {1, 2};
   v128_trans2d t = {{1, -1}, {1, 0}};
