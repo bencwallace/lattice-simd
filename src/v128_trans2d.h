@@ -3,6 +3,8 @@
 #include <array>
 #include <cstdint>
 #include <immintrin.h>
+#include <span>
+#include <stdexcept>
 
 #include "v128_point2d.h"
 
@@ -24,6 +26,24 @@ struct v128_box2d {
       : data(_mm_setr_epi32(intervals[0].left, intervals[1].left,
                             intervals[0].right, intervals[1].right)) {}
 
+  v128_box2d(std::span<const v128_point2d> points) {
+    std::array<int, 2> min;
+    std::array<int, 2> max;
+    min.fill(std::numeric_limits<int>::max());
+    max.fill(std::numeric_limits<int>::min());
+    for (const auto &p : points) {
+      for (int i = 0; i < 2; ++i) { // TODO: vectorize (not urgent)
+        min[i] = std::min(min[i], p[i]);
+        max[i] = std::max(max[i], p[i]);
+      }
+    }
+    // anchor at (1, 0, ..., 0)
+    insert_epi32(data, min[0] - points[0][0] + 1, 0);
+    insert_epi32(data, max[0] - points[0][0] + 1, 2);
+    insert_epi32(data, min[1] - points[0][1], 1);
+    insert_epi32(data, max[1] - points[0][1], 3);
+  }
+
   v128_interval operator[](size_t i) const {
     return {int32_t(extract_epi32(data, i)),
             int32_t(extract_epi32(data, i + 2))};
@@ -32,6 +52,12 @@ struct v128_box2d {
   v128_box2d operator+(const v128_point2d &p) const {
     __m128i offset = _mm_shuffle_epi32(p.data, _MM_SHUFFLE(1, 0, 1, 0));
     return _mm_add_epi32(data, offset);
+  }
+
+  // TODO: double-check
+  v128_box2d operator-(const v128_point2d &b) {
+    __m128i offset = _mm_shuffle_epi32(b.data, _MM_SHUFFLE(1, 0, 1, 0));
+    return _mm_sub_epi32(data, offset);
   }
 
   v128_box2d operator|(const v128_box2d &b) const {
@@ -91,6 +117,32 @@ struct v128_trans2d {
   bool operator==(const v128_trans2d &other) const {
     return _mm_movemask_epi8(_mm_cmpeq_epi32(signs, other.signs)) == 0xFFFF &&
            _mm_movemask_epi8(_mm_cmpeq_epi32(perm, other.perm)) == 0xFFFF;
+  }
+
+  static v128_trans2d from_points(const v128_point2d &p,
+                                  const v128_point2d &q) {
+    auto result = v128_trans2d();
+    v128_point2d diff = q - p;
+    int idx = -1;
+    for (int i = 0; i < 2; ++i) {
+      if (std::abs(diff[i]) == 1) {
+        if (idx == -1) {
+          idx = i;
+        } else {
+          throw std::invalid_argument("Points are not adjacent");
+        }
+      }
+    }
+    if (idx == -1) {
+      throw std::invalid_argument("Points are not adjacent");
+    }
+
+    insert_epi32(result.perm, idx, 0);
+    insert_epi32(result.perm, 0, idx);
+    insert_epi32(result.signs, -diff[idx], 0);
+    insert_epi32(result.signs, diff[idx], idx);
+
+    return result;
   }
 
   std::pair<int32_t, uint32_t> operator[](size_t i) const {
