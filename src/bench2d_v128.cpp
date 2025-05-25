@@ -30,6 +30,20 @@ static void BM_V128Union(benchmark::State &state) {
 }
 BENCHMARK(BM_V128Union);
 
+static void BM_V128Intersection(benchmark::State &state) {
+  v128_box2d box1({v128_interval{1, 3}, v128_interval{3, 5}});
+  v128_box2d box2({v128_interval{2, 4}, v128_interval{2, 4}});
+  benchmark::DoNotOptimize(box1);
+  benchmark::DoNotOptimize(box2);
+
+  v128_box2d box;
+  for (auto _ : state) {
+    box = box1 & box2;
+    benchmark::DoNotOptimize(box);
+  }
+}
+BENCHMARK(BM_V128Intersection);
+
 static void BM_V128Transform(benchmark::State &state) {
   v128_point2d p = {1, 2};
   v128_trans2d t = {{-1, 1}, {1, 0}};
