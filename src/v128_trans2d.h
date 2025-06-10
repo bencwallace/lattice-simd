@@ -81,6 +81,11 @@ struct v128_trans2d {
       : signs(_mm_setr_epi32(signs[0], signs[1], signs[0], signs[1])),
         perm(_mm_setr_epi32(perm[0], perm[1], 2 + perm[0], 2 + perm[1])) {}
 
+  bool operator==(const v128_trans2d &other) const {
+    return _mm_movemask_epi8(_mm_cmpeq_epi32(signs, other.signs)) == 0xFFFF &&
+           _mm_movemask_epi8(_mm_cmpeq_epi32(perm, other.perm)) == 0xFFFF;
+  }
+
   std::pair<int32_t, uint32_t> operator[](size_t i) const {
     return {extract_epi32(signs, i), extract_epi32(perm, i)};
   }
