@@ -64,6 +64,29 @@ TEST(Vector128, TransformBox) {
   EXPECT_EQ(c[1], v128_interval({1, 3}));
 }
 
+TEST(Vector128, Inverse) {
+  v128_trans2d id = {{1, 1}, {0, 1}};
+  v128_point2d o = {0, 0};
+  v128_point2d e1 = {1, 0};
+  v128_point2d e2 = {0, 1};
+  ASSERT_EQ(e1, id * e1);
+  ASSERT_EQ(e2, id * e2);
+
+  v128_trans2d t = {{-1, 1}, {1, 0}};
+  v128_trans2d t_inv = t.inverse();
+  auto f1 = t * e1;
+  auto f2 = t * e2;
+  ASSERT_EQ(f1, e2);
+  ASSERT_EQ(f2, o - e1);
+  EXPECT_EQ(e1, t_inv * f1);
+  EXPECT_EQ(e2, t_inv * f2);
+
+  auto ttinv = t * t_inv;
+  auto tinvt = t_inv * t;
+  EXPECT_EQ(ttinv, id);
+  EXPECT_EQ(tinvt, id);
+}
+
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
