@@ -94,7 +94,7 @@ struct v128_trans2d {
     return _mm_sign_epi32(permutevar_epi32(p.data, perm), signs);
   }
 
-  v128_trans2d operator*(const v128_trans2d &t) {
+  v128_trans2d operator*(const v128_trans2d &t) const {
     __m128i new_perm = permutevar_epi32(perm, t.perm);
     __m128i new_signs = _mm_sign_epi32(permutevar_epi32(t.signs, perm), signs);
     return {new_signs, new_perm};
