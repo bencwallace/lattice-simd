@@ -104,4 +104,13 @@ struct v128_trans2d {
     __m128i pairs = _mm_sign_epi32(permutevar_epi32(b.data, perm), signs);
     return sort_bounds(pairs);
   }
+
+  // TODO
+  v128_trans2d inverse() const {
+    // In general, the inverse is given by signs S' and permutations P' such
+    // that P' = P^-1 and S' = S P. The latter's components can be obtained by
+    // viewing S as a vector and applying P to it (i.e. permuting it). Moreover,
+    // in 2D, P^-1 is the same as P.
+    return v128_trans2d(permutevar_epi32(signs, perm), perm);
+  }
 };
