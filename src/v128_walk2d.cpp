@@ -24,6 +24,11 @@ public:
     return balanced_rep(steps, 1, v128_trans2d());
   }
 
+  bool intersect() const {
+    return ::intersect(left_, right_, v128_point2d(), left_->end_,
+                       v128_trans2d(), symm_);
+  }
+
 private:
   int num_sites_;
   walk_node *parent_{};
@@ -86,7 +91,39 @@ private:
     static walk_node leaf = create_leaf();
     return leaf;
   }
+
+  friend bool intersect(const walk_node *l_walk, const walk_node *r_walk,
+                        const v128_point2d &l_anchor,
+                        const v128_point2d &r_anchor,
+                        const v128_trans2d &l_symm, const v128_trans2d &r_symm);
 };
+
+bool intersect(const walk_node *l_walk, const walk_node *r_walk,
+               const v128_point2d &l_anchor, const v128_point2d &r_anchor,
+               const v128_trans2d &l_symm, const v128_trans2d &r_symm) {
+  auto l_box = l_symm * l_walk->bbox_ + l_anchor;
+  auto r_box = r_symm * r_walk->bbox_ + r_anchor;
+  if ((l_box & r_box).empty()) {
+    return false;
+  }
+
+  if (l_walk->num_sites_ <= 2 && r_walk->num_sites_ <= 2) {
+    return true;
+  }
+
+  if (l_walk->num_sites_ >= r_walk->num_sites_) {
+    return intersect(l_walk->right_, r_walk,
+                     l_anchor + l_symm * l_walk->left_->end_, r_anchor,
+                     l_symm * l_walk->symm_, r_symm) ||
+           intersect(l_walk->left_, r_walk, l_anchor, r_anchor, l_symm, r_symm);
+  } else {
+    return intersect(l_walk, r_walk->left_, l_anchor, r_anchor, l_symm,
+                     r_symm) ||
+           intersect(l_walk, r_walk->right_, l_anchor,
+                     r_anchor + r_symm * r_walk->left_->end_, l_symm,
+                     r_symm * r_walk->symm_);
+  }
+}
 
 class walk_tree {
 
