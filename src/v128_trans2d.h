@@ -49,6 +49,13 @@ struct v128_box2d {
     __m128i maxs = _mm_max_epi32(data, b.data);
     return _mm_blend_epi32(mins, maxs, 0b0011);
   }
+
+  bool empty() const {
+    __m128i swapped = _mm_shuffle_epi32(data, _MM_SHUFFLE(1, 0, 3, 2));
+    __m128i cmp = _mm_cmpgt_epi32(data, swapped);
+    auto result = _mm_cvtsi128_si64(cmp); // Only check the lower 64 bits
+    return result != 0;
+  }
 };
 
 // Given a vector (a, b, c, d) representing potentially unsorted intervals
@@ -105,7 +112,6 @@ struct v128_trans2d {
     return sort_bounds(pairs);
   }
 
-  // TODO
   v128_trans2d inverse() const {
     // In general, the inverse is given by signs S' and permutations P' such
     // that P' = P^-1 and S' = S P. The latter's components can be obtained by

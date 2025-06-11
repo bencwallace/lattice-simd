@@ -41,6 +41,20 @@ TEST(Vector128, Intersection2) {
   EXPECT_EQ(box[1], v128_interval({-1, -1}));
 }
 
+TEST(Vector128, BoxEmpty) {
+  v128_box2d box1({v128_interval{1, 3}, v128_interval{3, 5}});
+  EXPECT_FALSE(box1.empty());
+
+  v128_box2d box2({v128_interval{1, 1}, v128_interval{2, 2}});
+  EXPECT_FALSE(box2.empty());
+
+  v128_box2d box3({v128_interval{1, 1}, v128_interval{2, 1}});
+  EXPECT_TRUE(box3.empty());
+
+  v128_box2d box4({v128_interval{-1, 1}, v128_interval{2, 1}});
+  EXPECT_TRUE(box4.empty());
+}
+
 TEST(Vector128, TransformPoint) {
   v128_point2d p = {1, 2};
   v128_trans2d t = {{1, -1}, {1, 0}};

@@ -44,6 +44,17 @@ static void BM_V128Intersection(benchmark::State &state) {
 }
 BENCHMARK(BM_V128Intersection);
 
+static void BM_V128BoxEmpty(benchmark::State &state) {
+  v128_box2d box1({v128_interval{1, 3}, v128_interval{3, 5}});
+  benchmark::DoNotOptimize(box1);
+
+  for (auto _ : state) {
+    bool empty = box1.empty();
+    benchmark::DoNotOptimize(empty);
+  }
+}
+BENCHMARK(BM_V128BoxEmpty);
+
 static void BM_V128Transform(benchmark::State &state) {
   v128_point2d p = {1, 2};
   v128_trans2d t = {{-1, 1}, {1, 0}};
