@@ -59,6 +59,13 @@ template <size_t N> struct s_box {
     }
     return {new_intervals};
   }
+
+  bool empty() const {
+    return std::any_of(intervals.begin(), intervals.end(),
+                       [](const s_interval &interval) {
+                         return interval.left > interval.right;
+                       });
+  }
 };
 
 template <size_t N> struct s_trans {

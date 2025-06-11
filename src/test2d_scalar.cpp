@@ -42,6 +42,20 @@ TEST(Scalar, Intersection2) {
   EXPECT_EQ(box[1], s_interval({-1, -1}));
 }
 
+TEST(Scalar, BoxEmpty) {
+  auto box1 = s_box<2>({s_interval{1, 3}, s_interval{3, 5}});
+  EXPECT_FALSE(box1.empty());
+
+  auto box2 = s_box<2>({s_interval{1, 1}, s_interval{2, 2}});
+  EXPECT_FALSE(box2.empty());
+
+  auto box3 = s_box<2>({s_interval{1, 1}, s_interval{2, 1}});
+  EXPECT_TRUE(box3.empty());
+
+  auto box4 = s_box<2>({s_interval{-1, 1}, s_interval{2, 1}});
+  EXPECT_TRUE(box4.empty());
+}
+
 TEST(Scalar, TranslateBox) {
   auto b = s_box<2>({s_interval{1, 3}, s_interval{3, 4}});
   s_point<2> p = {1, 2};
