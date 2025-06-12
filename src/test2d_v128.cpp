@@ -78,6 +78,20 @@ TEST(Vector128, TransformBox) {
   EXPECT_EQ(c[1], v128_interval({1, 3}));
 }
 
+TEST(Vector128, TransformIsIdentity) {
+  v128_trans2d t1 = {{1, 1}, {0, 1}};
+  EXPECT_TRUE(t1.is_identity());
+
+  v128_trans2d t2 = {{-1, 1}, {0, 1}};
+  EXPECT_FALSE(t2.is_identity());
+
+  v128_trans2d t3 = {{1, 1}, {1, 0}};
+  EXPECT_FALSE(t3.is_identity());
+
+  v128_trans2d t4 = {{1, -1}, {0, 1}};
+  EXPECT_FALSE(t4.is_identity());
+}
+
 TEST(Vector128, Inverse) {
   v128_trans2d id = {{1, 1}, {0, 1}};
   v128_point2d o = {0, 0};
