@@ -1,8 +1,10 @@
 #pragma once
 
+#include <algorithm>
 #include <array>
 #include <cstdint>
 #include <immintrin.h>
+#include <random>
 #include <span>
 #include <stdexcept>
 
@@ -145,6 +147,25 @@ struct v128_trans2d {
     return result;
   }
 
+  template <typename Gen> static v128_trans2d rand(Gen &gen) {
+    // TODO: Can this be vectorized?
+    static std::bernoulli_distribution flip_;
+
+    std::array<uint32_t, 2> perm = {0, 1};
+    std::array<int32_t, 2> signs;
+    for (int i = 0; i < 2; ++i) {
+      signs[i] = 2 * flip_(gen) - 1;
+    }
+    std::shuffle(perm.begin(), perm.end(), gen);
+    return v128_trans2d(signs, perm);
+  }
+
+  static v128_trans2d rand() {
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+    return rand(gen);
+  }
+
   std::pair<int32_t, uint32_t> operator[](size_t i) const {
     return {extract_epi32(signs, i), extract_epi32(perm, i)};
   }
@@ -162,6 +183,13 @@ struct v128_trans2d {
   v128_box2d operator*(const v128_box2d &b) const {
     __m128i pairs = _mm_sign_epi32(permutevar_epi32(b.data, perm), signs);
     return sort_bounds(pairs);
+  }
+
+  bool is_identity() const {
+    return _mm_movemask_epi8(_mm_cmpeq_epi32(signs, _mm_set1_epi32(1))) ==
+               0xFFFF &&
+           _mm_movemask_epi8(
+               _mm_cmpeq_epi32(perm, _mm_setr_epi32(0, 1, 2, 3))) == 0xFFFF;
   }
 
   v128_trans2d inverse() const {
