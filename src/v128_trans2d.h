@@ -40,10 +40,10 @@ struct v128_box2d {
       }
     }
     // anchor at (1, 0, ..., 0)
-    insert_epi32(data, min[0] - points[0][0] + 1, 0);
-    insert_epi32(data, max[0] - points[0][0] + 1, 2);
-    insert_epi32(data, min[1] - points[0][1], 1);
-    insert_epi32(data, max[1] - points[0][1], 3);
+    data = insert_epi32(data, min[0] - points[0][0] + 1, 0);
+    data = insert_epi32(data, max[0] - points[0][0] + 1, 2);
+    data = insert_epi32(data, min[1] - points[0][1], 1);
+    data = insert_epi32(data, max[1] - points[0][1], 3);
   }
 
   v128_interval operator[](size_t i) const {
