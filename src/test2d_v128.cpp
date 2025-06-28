@@ -55,6 +55,35 @@ TEST(Vector128, BoxEmpty) {
   EXPECT_TRUE(box4.empty());
 }
 
+TEST(Vector128, BoxFromSpan) {
+  v128_point2d p1 = {1, 2};
+  auto b1 = v128_box2d(std::array{p1});
+  EXPECT_EQ(b1[0].left, 1);
+  EXPECT_EQ(b1[0].right, 1);
+  EXPECT_EQ(b1[1].left, 0);
+  EXPECT_EQ(b1[1].right, 0);
+
+  v128_point2d p2 = {5, 5};
+  auto b2 = v128_box2d(std::array{p1, p2});
+  EXPECT_EQ(b2[0].left, 1);
+  EXPECT_EQ(b2[0].right, 5);
+  EXPECT_EQ(b2[1].left, 0);
+  EXPECT_EQ(b2[1].right, 3);
+
+  auto b3 = v128_box2d(std::array{p2, p1});
+  EXPECT_EQ(b3[0].left, -3);
+  EXPECT_EQ(b3[0].right, 1);
+  EXPECT_EQ(b3[1].left, -3);
+  EXPECT_EQ(b3[1].right, 0);
+
+  v128_point2d p3 = {3, 4};
+  auto b4 = v128_box2d(std::array{p1, p2, p3});
+  EXPECT_EQ(b4[0].left, 1);
+  EXPECT_EQ(b4[0].right, 5);
+  EXPECT_EQ(b4[1].left, 0);
+  EXPECT_EQ(b4[1].right, 3);
+}
+
 TEST(Vector128, TransformPoint) {
   v128_point2d p = {1, 2};
   v128_trans2d t = {{1, -1}, {1, 0}};
