@@ -7,7 +7,7 @@ int main() {
   int iters = 1000000;
   auto interval = static_cast<int>(
       std::pow(10, std::floor(std::log10(std::max(iters / 10, 1)))));
-  std::unique_ptr<walk_tree> w = std::make_unique<walk_tree>(1000000);
+  std::unique_ptr<walk_tree> w = std::make_unique<walk_tree>(1000000, 42);
 
   // std::vector<v128_point2d> endpoints;
 
