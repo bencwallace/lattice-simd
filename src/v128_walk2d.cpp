@@ -180,6 +180,24 @@ private:
             const v128_box2d &bbox, const v128_point2d &end)
       : num_sites_(num_sites), symm_(symm), bbox_(bbox), end_(end) {}
 
+  std::vector<v128_point2d> steps() const {
+    std::vector<v128_point2d> result;
+    if (is_leaf()) {
+      result.push_back(end_);
+      return result;
+    }
+
+    auto left_steps = left_->steps();
+    result.insert(result.begin(), left_steps.begin(), left_steps.end());
+
+    auto right_steps = right_->steps();
+    for (auto &step : right_steps) {
+      result.push_back(left_->end_ + symm_ * step);
+    }
+
+    return result;
+  }
+
   static walk_node create_leaf() {
     std::array<v128_interval, 2> intervals;
     intervals[0] = v128_interval(1, 1);
@@ -284,6 +302,18 @@ public:
     auto site = dist_(rng_);
     auto r = v128_trans2d::rand(rng_);
     return try_pivot(site, r);
+  }
+
+  bool self_avoiding() const {
+    auto steps = this->root_->steps();
+    for (size_t i = 0; i < steps.size(); ++i) {
+      for (size_t j = i + 1; j < steps.size(); ++j) {
+        if (steps[i] == steps[j]) {
+          return false;
+        }
+      }
+    }
+    return true;
   }
 
 private:

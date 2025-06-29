@@ -2,6 +2,7 @@
 #include <random>
 
 #include "v128_trans2d.h"
+#include "v128_walk2d.cpp"
 
 TEST(Vector128, Equal) {
   v128_point2d p = {1, 2};
@@ -142,6 +143,20 @@ TEST(Vector128, Inverse) {
   auto tinvt = t_inv * t;
   EXPECT_EQ(ttinv, id);
   EXPECT_EQ(tinvt, id);
+}
+
+TEST(Vector128, SelfAvoiding) {
+  std::mt19937 gen(std::random_device{}());
+  std::uniform_int_distribution<int> dist(0, 1);
+  for (int num_steps = 2; num_steps < 10; ++num_steps) {
+    auto w = walk_tree(num_steps);
+    for (int i = 0; i < 10; ++i) {
+      for (int j = 0; j < 10; j++) {
+        w.rand_pivot();
+      }
+      EXPECT_TRUE(w.self_avoiding());
+    }
+  }
 }
 
 int main(int argc, char **argv) {
