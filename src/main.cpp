@@ -1,7 +1,9 @@
 #include <algorithm>
+#include <cmath>
 #include <iostream>
+#include <memory>
 
-#include "v128_walk2d.cpp"
+#include "v128_walk2d.h"
 
 int main() {
   int iters = 1000000;
