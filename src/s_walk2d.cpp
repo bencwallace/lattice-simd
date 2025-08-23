@@ -1,0 +1,283 @@
+#include <memory>
+#include <random>
+#include <span>
+#include <stack>
+#include <vector>
+
+#include "s_walk2d.h"
+
+std::vector<s_point<2>> line(int num_steps) {
+  std::vector<s_point<2>> steps(num_steps);
+  for (int i = 0; i < num_steps; ++i) {
+    steps[i] = (i + 1) * unit<2>();
+  }
+  return steps;
+}
+
+walk_node *walk_node::balanced_rep(const std::vector<s_point<2>> &steps) {
+  return balanced_rep(steps, 1, s_trans<2>());
+}
+
+bool walk_node::is_leaf() const {
+  return left_ == nullptr && right_ == nullptr;
+}
+
+void walk_node::merge() {
+  num_sites_ = left_->num_sites_ + right_->num_sites_;
+
+  bbox_ = left_->bbox_ | (symm_ * right_->bbox_ + left_->end_);
+  end_ = left_->end_ + symm_ * right_->end_;
+}
+
+walk_node *walk_node::rotate_left(bool set_parent) {
+  if (right_->is_leaf()) {
+    throw std::invalid_argument("can't rotate left on a leaf node");
+  }
+  auto temp_tree = right_;
+
+  // update pointers
+  right_ = temp_tree->right_;
+  if (set_parent && temp_tree->right_ != nullptr) {
+    temp_tree->right_->parent_ = this;
+  }
+  temp_tree->right_ = temp_tree->left_;
+  temp_tree->left_ = left_;
+  if (set_parent && left_ != nullptr) {
+    left_->parent_ = temp_tree;
+  }
+  left_ = temp_tree;
+
+  // update symmetries
+  auto temp_symm = symm_;
+  symm_ = temp_symm * left_->symm_;
+  left_->symm_ = temp_symm;
+
+  // merge
+  left_->merge();
+
+  return this;
+}
+
+walk_node *walk_node::rotate_right(bool set_parent) {
+  if (left_->is_leaf()) {
+    throw std::invalid_argument("can't rotate right on a leaf node");
+  }
+  auto temp_tree = left_;
+
+  // update pointers
+  left_ = temp_tree->left_;
+  if (set_parent && temp_tree->left_ != nullptr) {
+    temp_tree->left_->parent_ = this;
+  }
+  temp_tree->left_ =
+      temp_tree->right_; // temp_tree->set_left(temp_tree->right_)
+                         // sets parent unnecessarily
+  temp_tree->right_ = right_;
+  if (set_parent && right_ != nullptr) {
+    right_->parent_ = temp_tree;
+  }
+  right_ = temp_tree; // set_right(temp_tree) sets parent unnecessarily
+
+  // update symmetries
+  auto temp_symm = symm_;
+  symm_ = right_->symm_;
+  right_->symm_ = symm_.inverse() * temp_symm;
+
+  // merge
+  right_->merge();
+
+  return this;
+}
+
+walk_node *walk_node::shuffle_up(int id) {
+  if (id < left_->num_sites_) {
+    left_->shuffle_up(id);
+    rotate_right();
+  } else if (id > left_->num_sites_) {
+    right_->shuffle_up(id - left_->num_sites_);
+    rotate_left();
+  }
+
+  return this;
+}
+
+walk_node *walk_node::shuffle_down() {
+  int id = std::floor((num_sites_ + 1) / 2.0);
+  if (id < left_->num_sites_) {
+    rotate_right();
+    right_->shuffle_down();
+  } else if (id > left_->num_sites_) {
+    rotate_left();
+    left_->shuffle_down();
+  }
+
+  return this;
+}
+
+bool walk_node::intersect() const {
+  return ::intersect(left_, right_, s_point<2>(), left_->end_, s_trans<2>(),
+                     symm_);
+}
+
+walk_node *walk_node::balanced_rep(std::span<const s_point<2>> steps, int start,
+                                   const s_trans<2> &glob_symm) {
+  int num_sites = steps.size();
+  if (num_sites < 1) {
+    throw std::invalid_argument("num_sites must be at least 1");
+  }
+  if (num_sites == 1) {
+    return &leaf();
+  }
+
+  int n = std::floor((1 + num_sites) / 2.0);
+  auto abs_symm = s_trans<2>::from_points(steps[n - 1], steps[n]);
+  auto glob_inv = glob_symm.inverse();
+  auto rel_symm = glob_inv * abs_symm;
+  auto rel_end = glob_inv * (steps.back() - steps.front()) + unit<2>();
+  auto rel_box = (glob_inv * (s_box<2>(steps) - unit<2>())) + unit<2>();
+  int id = start + n - 1;
+  walk_node *root = new walk_node(id, num_sites, rel_symm, rel_box, rel_end);
+
+  if (n >= 1) {
+    root->left_ = balanced_rep(steps.subspan(0, n), start, glob_symm);
+    root->left_->parent_ = root;
+  }
+  if (num_sites - n >= 1) {
+    root->right_ =
+        balanced_rep(steps.subspan(n), start + n, glob_symm * rel_symm);
+    root->right_->parent_ = root;
+  }
+  return root;
+}
+
+walk_node::walk_node(int id, int num_sites, const s_trans<2> &symm,
+                     const s_box<2> &bbox, const s_point<2> &end)
+    : num_sites_(num_sites), symm_(symm), bbox_(bbox), end_(end) {}
+
+std::vector<s_point<2>> walk_node::steps() const {
+  std::vector<s_point<2>> result;
+  if (is_leaf()) {
+    result.push_back(end_);
+    return result;
+  }
+
+  auto left_steps = left_->steps();
+  result.insert(result.begin(), left_steps.begin(), left_steps.end());
+
+  auto right_steps = right_->steps();
+  for (auto &step : right_steps) {
+    result.push_back(left_->end_ + symm_ * step);
+  }
+
+  return result;
+}
+
+walk_node walk_node::create_leaf() {
+  std::array<s_interval, 2> intervals;
+  intervals[0] = s_interval(1, 1);
+  for (int i = 1; i < 2; ++i) {
+    intervals[i] = s_interval(0, 0);
+  }
+  return walk_node(0, 1, s_trans<2>(), s_box<2>(intervals), unit<2>());
+}
+
+walk_node &walk_node::leaf() {
+  static walk_node leaf = create_leaf();
+  return leaf;
+}
+
+bool intersect(const walk_node *l_walk, const walk_node *r_walk,
+               const s_point<2> &l_anchor, const s_point<2> &r_anchor,
+               const s_trans<2> &l_symm, const s_trans<2> &r_symm) {
+  auto l_box = l_symm * l_walk->bbox_ + l_anchor;
+  auto r_box = r_symm * r_walk->bbox_ + r_anchor;
+  if ((l_box & r_box).empty()) {
+    return false;
+  }
+
+  if (l_walk->num_sites_ <= 2 && r_walk->num_sites_ <= 2) {
+    return true;
+  }
+
+  if (l_walk->num_sites_ >= r_walk->num_sites_) {
+    return intersect(l_walk->right_, r_walk,
+                     l_anchor + l_symm * l_walk->left_->end_, r_anchor,
+                     l_symm * l_walk->symm_, r_symm) ||
+           intersect(l_walk->left_, r_walk, l_anchor, r_anchor, l_symm, r_symm);
+  } else {
+    return intersect(l_walk, r_walk->left_, l_anchor, r_anchor, l_symm,
+                     r_symm) ||
+           intersect(l_walk, r_walk->right_, l_anchor,
+                     r_anchor + r_symm * r_walk->left_->end_, l_symm,
+                     r_symm * r_walk->symm_);
+  }
+}
+
+walk_tree::walk_tree(int num_sites, std::optional<unsigned int> seed)
+    : walk_tree(line(num_sites), seed) {}
+
+walk_tree::walk_tree(const std::vector<s_point<2>> &steps,
+                     std::optional<unsigned int> seed) {
+  if (steps.size() < 2) {
+    throw std::invalid_argument("walk must have at least 2 sites (1 step)");
+  }
+
+  root_ = std::unique_ptr<walk_node>(walk_node::balanced_rep(steps));
+
+  rng_ = std::mt19937(seed.value_or(std::random_device()()));
+  dist_ = std::uniform_int_distribution<int>(1, steps.size() - 1);
+}
+
+walk_tree::~walk_tree() {
+  std::stack<walk_node *> nodes;
+  nodes.push(root_.release());
+  while (!nodes.empty()) {
+    auto curr = nodes.top();
+    nodes.pop();
+    if (curr->left_ && !curr->left_->is_leaf()) {
+      nodes.push(curr->left_);
+    }
+    if (curr->right_ && !curr->right_->is_leaf()) {
+      nodes.push(curr->right_);
+    }
+    curr->~walk_node();
+  }
+}
+
+bool walk_tree::try_pivot(int n, const s_trans<2> &r) {
+  if (r.is_identity()) {
+    return false;
+  }
+
+  root_->shuffle_up(n);
+  auto root_symm = root_->symm_;
+  root_->symm_ = root_->symm_ * r;
+  auto success = !root_->intersect();
+  if (!success) {
+    root_->symm_ = root_symm;
+  } else {
+    root_->merge();
+  }
+  root_->shuffle_down();
+  return success;
+}
+
+bool walk_tree::rand_pivot() {
+  auto site = dist_(rng_);
+  auto r = s_trans<2>::rand(rng_);
+  return try_pivot(site, r);
+}
+
+bool walk_tree::self_avoiding() const {
+  auto steps = this->root_->steps();
+  for (size_t i = 0; i < steps.size(); ++i) {
+    for (size_t j = i + 1; j < steps.size(); ++j) {
+      if (steps[i] == steps[j]) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+std::vector<s_point<2>> walk_tree::steps() const { return root_->steps(); }

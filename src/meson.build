@@ -11,3 +11,4 @@ executable('bench2d_v64', 'bench2d_v64.cpp', dependencies: [benchmark])
 executable('bench2d_v128', 'bench2d_v128.cpp', dependencies: [benchmark])
 
 executable('walk', 'main.cpp', 'v128_walk2d.cpp')
+executable('s_walk', 's_main.cpp', 's_walk2d.cpp')

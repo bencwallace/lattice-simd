@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <array>
-#include <cstdint>
 #include <immintrin.h>
 #include <random>
 #include <span>
