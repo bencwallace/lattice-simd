@@ -2,6 +2,7 @@
 #include <random>
 
 #include "v128_trans2d.h"
+#include "v128_walk2d.cpp"
 
 TEST(Vector128, Equal) {
   v128_point2d p = {1, 2};
@@ -55,6 +56,35 @@ TEST(Vector128, BoxEmpty) {
   EXPECT_TRUE(box4.empty());
 }
 
+TEST(Vector128, BoxFromSpan) {
+  v128_point2d p1 = {1, 2};
+  auto b1 = v128_box2d(std::array{p1});
+  EXPECT_EQ(b1[0].left, 1);
+  EXPECT_EQ(b1[0].right, 1);
+  EXPECT_EQ(b1[1].left, 0);
+  EXPECT_EQ(b1[1].right, 0);
+
+  v128_point2d p2 = {5, 5};
+  auto b2 = v128_box2d(std::array{p1, p2});
+  EXPECT_EQ(b2[0].left, 1);
+  EXPECT_EQ(b2[0].right, 5);
+  EXPECT_EQ(b2[1].left, 0);
+  EXPECT_EQ(b2[1].right, 3);
+
+  auto b3 = v128_box2d(std::array{p2, p1});
+  EXPECT_EQ(b3[0].left, -3);
+  EXPECT_EQ(b3[0].right, 1);
+  EXPECT_EQ(b3[1].left, -3);
+  EXPECT_EQ(b3[1].right, 0);
+
+  v128_point2d p3 = {3, 4};
+  auto b4 = v128_box2d(std::array{p1, p2, p3});
+  EXPECT_EQ(b4[0].left, 1);
+  EXPECT_EQ(b4[0].right, 5);
+  EXPECT_EQ(b4[1].left, 0);
+  EXPECT_EQ(b4[1].right, 3);
+}
+
 TEST(Vector128, TransformPoint) {
   v128_point2d p = {1, 2};
   v128_trans2d t = {{1, -1}, {1, 0}};
@@ -78,6 +108,20 @@ TEST(Vector128, TransformBox) {
   EXPECT_EQ(c[1], v128_interval({1, 3}));
 }
 
+TEST(Vector128, TransformIsIdentity) {
+  v128_trans2d t1 = {{1, 1}, {0, 1}};
+  EXPECT_TRUE(t1.is_identity());
+
+  v128_trans2d t2 = {{-1, 1}, {0, 1}};
+  EXPECT_FALSE(t2.is_identity());
+
+  v128_trans2d t3 = {{1, 1}, {1, 0}};
+  EXPECT_FALSE(t3.is_identity());
+
+  v128_trans2d t4 = {{1, -1}, {0, 1}};
+  EXPECT_FALSE(t4.is_identity());
+}
+
 TEST(Vector128, Inverse) {
   v128_trans2d id = {{1, 1}, {0, 1}};
   v128_point2d o = {0, 0};
@@ -99,6 +143,20 @@ TEST(Vector128, Inverse) {
   auto tinvt = t_inv * t;
   EXPECT_EQ(ttinv, id);
   EXPECT_EQ(tinvt, id);
+}
+
+TEST(Vector128, SelfAvoiding) {
+  std::mt19937 gen(std::random_device{}());
+  std::uniform_int_distribution<int> dist(0, 1);
+  for (int num_steps = 2; num_steps < 10; ++num_steps) {
+    auto w = walk_tree(num_steps);
+    for (int i = 0; i < 10; ++i) {
+      for (int j = 0; j < 10; j++) {
+        w.rand_pivot();
+      }
+      EXPECT_TRUE(w.self_avoiding());
+    }
+  }
 }
 
 int main(int argc, char **argv) {

@@ -68,6 +68,20 @@ static void BM_STransform(benchmark::State &state) {
 }
 BENCHMARK(BM_STransform);
 
+static void BM_SAffinePoint(benchmark::State &state) {
+  s_point<2> p = {1, 2};
+  s_trans<2> t = {{-1, 1}, {1, 0}};
+  benchmark::DoNotOptimize(t);
+  benchmark::DoNotOptimize(p);
+
+  s_point<2> q;
+  for (auto _ : state) {
+    q = t * p + p;
+    benchmark::DoNotOptimize(q);
+  }
+}
+BENCHMARK(BM_SAffinePoint);
+
 static void BM_SCompose(benchmark::State &state) {
   s_trans<2> t1 = {{-1, -1}, {1, 0}};
   s_trans<2> t2 = {{-1, 1}, {0, 1}};
@@ -109,5 +123,19 @@ static void BM_STransformBox(benchmark::State &state) {
   }
 }
 BENCHMARK(BM_STransformBox);
+
+static void BM_SAffineBox(benchmark::State &state) {
+  s_point<2> p = {1, 2};
+  s_trans<2> t = {{-1, 1}, {1, 0}};
+  benchmark::DoNotOptimize(t);
+  benchmark::DoNotOptimize(p);
+
+  s_point<2> q;
+  for (auto _ : state) {
+    q = t * p + p;
+    benchmark::DoNotOptimize(q);
+  }
+}
+BENCHMARK(BM_SAffineBox);
 
 BENCHMARK_MAIN();
