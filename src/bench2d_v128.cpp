@@ -68,6 +68,20 @@ static void BM_V128Transform(benchmark::State &state) {
 }
 BENCHMARK(BM_V128Transform);
 
+static void BM_V128AffinePoint(benchmark::State &state) {
+  v128_point2d p = {1, 2};
+  v128_trans2d t = {{-1, 1}, {1, 0}};
+  benchmark::DoNotOptimize(t);
+  benchmark::DoNotOptimize(p);
+
+  v128_point2d q;
+  for (auto _ : state) {
+    q = t * p + p;
+    benchmark::DoNotOptimize(q);
+  }
+}
+BENCHMARK(BM_V128AffinePoint);
+
 static void BM_V128Compose(benchmark::State &state) {
   v128_trans2d t1 = {{-1, -1}, {1, 0}};
   v128_trans2d t2 = {{-1, 1}, {0, 1}};
@@ -109,5 +123,19 @@ static void BM_V128TransformBox(benchmark::State &state) {
   }
 }
 BENCHMARK(BM_V128TransformBox);
+
+static void BM_V128AffineBox(benchmark::State &state) {
+  v128_point2d p = {1, 2};
+  v128_trans2d t = {{-1, 1}, {1, 0}};
+  benchmark::DoNotOptimize(t);
+  benchmark::DoNotOptimize(p);
+
+  v128_point2d q;
+  for (auto _ : state) {
+    q = t * p + p;
+    benchmark::DoNotOptimize(q);
+  }
+}
+BENCHMARK(BM_V128AffineBox);
 
 BENCHMARK_MAIN();
